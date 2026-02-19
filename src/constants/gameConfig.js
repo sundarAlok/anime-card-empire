@@ -1,0 +1,5 @@
+export const GAME_CONFIG = {
+  INITIAL_TAP_LIMIT: 100,
+  TAP_REFILL_INTERVAL_MS: 300000, // 5 minutes
+  MAX_TAPS_PER_SECOND: 15
+};
