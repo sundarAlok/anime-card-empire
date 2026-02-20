@@ -23,6 +23,9 @@ export const GameProvider = ({ children }) => {
     starter: { level: 1 }
   });
 
+  // NFTs - permanently owned
+  const [nfts, setNfts] = useState({});
+
   // Initialize refill timestamp AFTER mount (pure safe)
   useEffect(() => {
     lastRefillTimeRef.current = Date.now();

@@ -1,0 +1,551 @@
+/* ========================================
+   ANIME CARD EMPIRE - PROFILE PAGE STYLES
+   Best Ever Premium Profile Design
+   ======================================== */
+
+/* CSS Variables */
+:root {
+  --profile-primary: #10b981;
+  --profile-primary-glow: rgba(16, 185, 129, 0.5);
+  --profile-secondary: #34d399;
+  --profile-accent: #6366f1;
+  --profile-accent-glow: rgba(99, 102, 241, 0.5);
+  --profile-dark: #0f172a;
+  --profile-glass: rgba(15, 23, 42, 0.9);
+  --profile-border: rgba(16, 185, 129, 0.3);
+  --profile-text-primary: #ffffff;
+  --profile-text-secondary: #94a3b8;
+  --profile-gold: #fbbf24;
+  --profile-gold-glow: rgba(251, 191, 36, 0.5);
+}
+
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
+.profile-container {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--profile-dark) 0%, #1e293b 50%, #0f172a 100%);
+  padding-top: 80px;
+  padding-bottom: 2rem;
+}
+
+/* Background */
+.profile-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.profile-grid-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: 
+    linear-gradient(var(--profile-primary-glow) 1px, transparent 1px),
+    linear-gradient(90deg, var(--profile-primary-glow) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.profile-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+}
+
+.profile-glow-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--profile-primary-glow) 0%, transparent 70%);
+  top: -150px;
+  left: -100px;
+  animation: profileGlowFloat 10s ease-in-out infinite;
+}
+
+.profile-glow-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--profile-accent-glow) 0%, transparent 70%);
+  bottom: -100px;
+  right: -100px;
+  animation: profileGlowFloat 12s ease-in-out infinite reverse;
+}
+
+@keyframes profileGlowFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -30px); }
+}
+
+/* ========================================
+   PAGE CONTENT
+   ======================================== */
+.profile-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+.profile-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.profile-title {
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--profile-primary), var(--profile-secondary), var(--profile-primary));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: profileTitleShimmer 3s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes profileTitleShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.profile-subtitle {
+  font-size: 1rem;
+  color: var(--profile-text-secondary);
+}
+
+/* ========================================
+   PROFILE CARD (Main Avatar Section)
+   ======================================== */
+.profile-main {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .profile-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-avatar-card {
+  background: var(--profile-glass);
+  border-radius: 24px;
+  border: 2px solid var(--profile-border);
+  padding: 2rem;
+  text-align: center;
+  backdrop-filter: blur(15px);
+  transition: all 0.4s ease;
+}
+
+.profile-avatar-card:hover {
+  border-color: var(--profile-primary);
+  box-shadow: 0 20px 50px var(--profile-primary-glow);
+  transform: translateY(-5px);
+}
+
+.profile-avatar-section {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--profile-primary), var(--profile-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 4rem;
+  box-shadow: 0 10px 40px var(--profile-primary-glow);
+  border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-level-badge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--profile-gold), #f59e0b);
+  color: #1e1b4b;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  box-shadow: 0 4px 15px var(--profile-gold-glow);
+}
+
+.profile-name {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--profile-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.profile-title-text {
+  font-size: 1rem;
+  color: var(--profile-secondary);
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.profile-joined {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--profile-text-secondary);
+}
+
+/* ========================================
+   STATS OVERVIEW
+   ======================================== */
+.profile-stats-card {
+  background: var(--profile-glass);
+  border-radius: 24px;
+  border: 2px solid var(--profile-border);
+  padding: 2rem;
+  backdrop-filter: blur(15px);
+  transition: all 0.4s ease;
+}
+
+.profile-stats-card:hover {
+  border-color: var(--profile-primary);
+  box-shadow: 0 20px 50px var(--profile-primary-glow);
+}
+
+.profile-stats-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--profile-text-primary);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.profile-stat-box {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.profile-stat-box:hover {
+  transform: translateY(-3px);
+  border-color: var(--profile-primary);
+}
+
+.profile-stat-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-stat-label {
+  font-size: 0.75rem;
+  color: var(--profile-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.profile-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--profile-text-primary);
+}
+
+.profile-stat-value.stars {
+  color: var(--profile-gold);
+  text-shadow: 0 0 15px var(--profile-gold-glow);
+}
+
+.profile-stat-value.coins {
+  color: var(--profile-secondary);
+  text-shadow: 0 0 15px var(--profile-primary-glow);
+}
+
+.profile-stat-value.cards {
+  color: var(--profile-accent);
+  text-shadow: 0 0 15px var(--profile-accent-glow);
+}
+
+.profile-stat-value.nfts {
+  color: #8b5cf6;
+}
+
+/* ========================================
+   SECTIONS
+   ======================================== */
+.profile-section {
+  background: var(--profile-glass);
+  border-radius: 24px;
+  border: 2px solid var(--profile-border);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(15px);
+  transition: all 0.4s ease;
+}
+
+.profile-section:hover {
+  border-color: var(--profile-primary);
+  box-shadow: 0 20px 50px var(--profile-primary-glow);
+}
+
+.profile-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--profile-text-primary);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ========================================
+   ACTIVITY LOG
+   ======================================== */
+.profile-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.profile-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.profile-activity-item:hover {
+  border-color: var(--profile-border);
+  transform: translateX(5px);
+}
+
+.profile-activity-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.profile-activity-icon.tap {
+  background: linear-gradient(135deg, var(--profile-primary), var(--profile-secondary));
+}
+
+.profile-activity-icon.card {
+  background: linear-gradient(135deg, var(--profile-accent), #8b5cf6);
+}
+
+.profile-activity-icon.nft {
+  background: linear-gradient(135deg, var(--profile-gold), #f59e0b);
+}
+
+.profile-activity-icon.passive {
+  background: linear-gradient(135deg, #ec4899, #f43f5e);
+}
+
+.profile-activity-details {
+  flex: 1;
+}
+
+.profile-activity-text {
+  font-size: 0.95rem;
+  color: var(--profile-text-primary);
+  font-weight: 500;
+}
+
+.profile-activity-time {
+  font-size: 0.75rem;
+  color: var(--profile-text-secondary);
+}
+
+.profile-activity-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--profile-gold);
+}
+
+/* ========================================
+   ACHIEVEMENTS
+   ======================================== */
+.profile-achievements {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.profile-achievement {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-achievement:hover {
+  transform: translateY(-5px);
+  border-color: var(--profile-gold);
+  box-shadow: 0 10px 30px var(--profile-gold-glow);
+}
+
+.profile-achievement.locked {
+  opacity: 0.5;
+}
+
+.profile-achievement-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-achievement-name {
+  font-size: 0.7rem;
+  color: var(--profile-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   SETTINGS
+   ======================================== */
+.profile-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-setting-item:hover {
+  border-color: var(--profile-border);
+  transform: translateX(5px);
+}
+
+.profile-setting-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-setting-icon {
+  font-size: 1.25rem;
+}
+
+.profile-setting-text {
+  font-size: 0.95rem;
+  color: var(--profile-text-primary);
+  font-weight: 500;
+}
+
+.profile-setting-arrow {
+  color: var(--profile-text-secondary);
+  font-size: 1.25rem;
+}
+
+/* Toggle Switch */
+.profile-toggle {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-toggle.active {
+  background: var(--profile-primary);
+}
+
+.profile-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.profile-toggle.active::after {
+  left: 27px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .profile-title {
+    font-size: 2rem;
+  }
+  
+  .profile-content {
+    padding: 1rem;
+  }
+  
+  .profile-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    font-size: 3rem;
+  }
+  
+  .profile-achievements {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-title {
+    font-size: 1.75rem;
+  }
+  
+  .profile-achievements {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

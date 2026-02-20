@@ -36,11 +36,11 @@ const AnimatedNumber = ({ value = 0, duration = 600, format }) => {
   return <>{out}</>;
 };
 
-const StatCard = ({ label, value, suffix = "", large = false, accent = "text-gray-900" }) => {
+const StatCard = ({ label, value, suffix = "", large = false, accent = "text-indigo-400" }) => {
   return (
-    <div className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 ${large ? "col-span-2" : ""}`}>
-      <p className="text-xs text-gray-500 mb-2">{label}</p>
-      <div className={`flex items-baseline gap-2 ${large ? "text-5xl" : "text-2xl"} font-semibold ${accent}`}>
+    <div className={`game-stat rounded-xl p-4 ${large ? "col-span-2" : ""}`}>
+      <p className="text-xs text-indigo-300/70 uppercase tracking-wider mb-2">{label}</p>
+      <div className={`flex items-baseline gap-2 ${large ? "text-4xl" : "text-2xl"} font-bold ${accent}`}>
         <AnimatedNumber
           value={Number(value ?? 0)}
           duration={700}
@@ -49,7 +49,7 @@ const StatCard = ({ label, value, suffix = "", large = false, accent = "text-gra
             return large ? `${Number(n).toFixed(3)}` : `${Math.round(n)}`;
           }}
         />
-        {suffix && <span className="text-sm text-gray-500 font-medium">{suffix}</span>}
+        {suffix && <span className="text-sm text-indigo-300/50 font-medium">{suffix}</span>}
       </div>
     </div>
   );

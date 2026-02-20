@@ -1,107 +1,139 @@
-import TopBar from "../components/TopBar";
-import TapButton from "../components/TapButton";
-import CooldownBar from "../components/CooldownBar";
-import StatCard from "../components/StatCard";
 import { Link } from "react-router-dom";
 import { useGame } from "../context/useGame";
+import tapImg from "../assets/tap.png";
+import "../styles/home.css";
 
 const Home = () => {
-  const { stars, coins, tapLimit } = useGame();
+  const { stars, coins, tapLimit, tap, tapRefill } = useGame();
+
+  const maxTaps = 100;
+  const tapPercentage = (tapLimit / maxTaps) * 100;
+
+  const getTapLimitColor = () => {
+    if (tapPercentage > 60) return "full";
+    if (tapPercentage > 30) return "";
+    return "low";
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f7f9ff] to-white text-gray-900">
+    <div className="home-container">
+      {/* Animated Background */}
+      <div className="home-background">
+        <div className="grid-pattern" />
+        <div className="glow-orb glow-orb-1" />
+        <div className="glow-orb glow-orb-2" />
+        <div className="glow-orb glow-orb-3" />
+        <div className="particles">
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+          <div className="particle" />
+        </div>
+      </div>
 
-      <TopBar />
-
-      <main className="max-w-6xl mx-auto px-8 py-12">
-        {/* Grid: left = main, right = sidebar */}
-        <div className="grid grid-cols-12 gap-8">
-
-          {/* LEFT: Main Play Area */}
-          <section className="col-span-8">
-            <div className="bg-white rounded-3xl p-10 shadow-md border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-3xl font-semibold text-gray-900">Tap to Earn</h2>
-                  <p className="text-sm text-gray-500 mt-1">Active income — upgrade cards to increase passive stars.</p>
-                </div>
-
-                {/* Big star display (very visible) */}
-                <div className="flex items-center gap-4">
-                  <div className="bg-yellow-50 border border-yellow-100 px-4 py-2 rounded-lg text-center">
-                    <p className="text-xs text-yellow-600">Total Stars</p>
-                    <p className="text-3xl font-semibold text-yellow-700">⭐ <span className="ml-1">{Number(stars ?? 0).toFixed(3)}</span></p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cooldown + Tap area */}
-              <div className="mb-8">
-                <CooldownBar />
-              </div>
-
-              <div className="flex flex-col items-center">
-                <TapButton />
-                <p className="mt-6 text-sm text-gray-600">Tap Limit: <span className="font-medium text-gray-900">{tapLimit}</span></p>
-                <p className="mt-2 text-sm text-gray-500">Coins: <span className="font-semibold text-gray-900">{Number(coins ?? 0)}</span></p>
-              </div>
+      {/* Top Bar - Centered */}
+      <header className="top-bar-container">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto' }}>
+          {/* Logo */}
+          <div className="logo-container">
+            <div className="logo-icon">ACE</div>
+            <div className="logo-text">
+              <span className="logo-title">Anime Card Empire</span>
+              <span className="logo-subtitle">Idle • Tap • Collect</span>
             </div>
-          </section>
+          </div>
 
-          {/* RIGHT: Sidebar with quick links + stats */}
-          <aside className="col-span-4">
-            <div className="space-y-6">
-              {/* Quick Links */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-md font-semibold text-gray-900 mb-4">Quick Links</h3>
+          {/* Navigation */}
+          <nav className="nav-menu">
+            <Link to="/" className="nav-link active">Home</Link>
+            <Link to="/cards" className="nav-link">Cards</Link>
+            <Link to="/nfts" className="nav-link">NFTs</Link>
+            <Link to="/profile" className="nav-link">Profile</Link>
+          </nav>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <Link to="/cards" className="block px-4 py-3 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 transition">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm text-indigo-700 font-medium">Cards</div>
-                        <div className="text-xs text-gray-500">View & upgrade your cards</div>
-                      </div>
-                      <div className="text-indigo-700 font-semibold">→</div>
-                    </div>
-                  </Link>
-
-                  <Link to="/nfts" className="block px-4 py-3 rounded-lg bg-yellow-50 border border-yellow-100 hover:bg-yellow-100 transition">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm text-yellow-700 font-medium">NFT Marketplace</div>
-                        <div className="text-xs text-gray-500">Claim with stars</div>
-                      </div>
-                      <div className="text-yellow-700 font-semibold">→</div>
-                    </div>
-                  </Link>
-
-                  <Link to="/profile" className="block px-4 py-3 rounded-lg bg-gray-50 border border-gray-100 hover:bg-gray-100 transition">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm text-gray-800 font-medium">Profile</div>
-                        <div className="text-xs text-gray-500">Account & settings</div>
-                      </div>
-                      <div className="text-gray-600 font-semibold">→</div>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-md font-semibold text-gray-900 mb-4">Overview</h3>
-
-                <div className="grid grid-cols-1 gap-4">
-                  <StatCard label="Total Stars" value={stars ?? 0} large />
-                  <div className="grid grid-cols-2 gap-4">
-                    <StatCard label="Active Coins" value={coins ?? 0} />
-                    <StatCard label="Tap Limit" value={tapLimit ?? 0} />
-                  </div>
-                </div>
-              </div>
+          {/* Stats */}
+          <div className="stats-container">
+            <div className="stat-badge coins">
+              <span className="stat-icon">🪙</span>
+              <span className="stat-value">{Number(coins ?? 0).toLocaleString()}</span>
             </div>
-          </aside>
+            <div className="stat-badge stars">
+              <span className="stat-icon">⭐</span>
+              <span className="stat-value">{(Number(stars ?? 0)).toFixed(3)}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="main-content">
+        {/* Currency Header - Stars Left, Coins Right */}
+        <div className="currency-header">
+          {/* Stars - Top Left */}
+          <div className="stars-display">
+            <div className="stars-glow" />
+            <div className="stars-card">
+              <div className="stars-label">
+                <span>⭐</span>
+                <span>Stars Earned</span>
+              </div>
+              <div className="stars-value">{Number(stars ?? 0).toFixed(3)}</div>
+            </div>
+          </div>
+
+          {/* Coins - Top Right */}
+          <div className="coins-display">
+            <div className="coins-glow" />
+            <div className="coins-card">
+              <div className="coins-label">
+                <span>Coins Earned</span>
+                <span>🪙</span>
+              </div>
+              <div className="coins-value">{Number(coins ?? 0).toLocaleString()}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tap Area */}
+        <div className="tap-area">
+          {/* Tap to Earn Title */}
+          <h1 className="tap-title">Tap to Earn</h1>
+          <p className="tap-subtitle">Tap the button to earn stars and coins. Upgrade your cards to increase passive income!</p>
+
+          {/* Tap Button */}
+          <div className="tap-button-container">
+            <div className="tap-outer-glow" />
+            <button
+              className="tap-button"
+              onClick={tap}
+              disabled={tapLimit <= 0}
+            >
+              <img
+                src={tapImg}
+                alt="Tap"
+                className="tap-button-image"
+              />
+              <div className="tap-button-overlay tap-shine" />
+              <div className="tap-button-overlay tap-reflection" />
+            </button>
+          </div>
+
+          {/* Tap Limit Display */}
+          <div className="tap-limit-container">
+            <div className="tap-limit-bar">
+              <div 
+                className={`tap-limit-fill ${getTapLimitColor()}`}
+                style={{ width: `${tapPercentage}%` }}
+              />
+            </div>
+            <span className="tap-limit-text">{tapLimit} / {maxTaps}</span>
+            <span className="tap-limit-label">Tap Limit</span>
+          </div>
         </div>
       </main>
     </div>
