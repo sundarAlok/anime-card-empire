@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useGame } from "../context/useGame";
+import SharedHeader from "../components/SharedHeader";
 import "../styles/profile.css";
+import "../styles/home.css";
+import "../styles/SharedHeader.css";
 
 // Mock achievements data
 const ACHIEVEMENTS = [
@@ -73,35 +75,8 @@ const Profile = () => {
         <div className="profile-glow profile-glow-2" />
       </div>
 
-      {/* Top Bar */}
-      <header className="top-bar-container" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="logo-container">
-            <Link to="/" className="logo-icon" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>ACE</Link>
-            <div className="logo-text">
-              <span className="logo-title">Anime Card Empire</span>
-              <span className="logo-subtitle">Idle • Tap • Collect</span>
-            </div>
-          </div>
-
-          <nav className="nav-menu">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/cards" className="nav-link">Cards</Link>
-            <Link to="/nfts" className="nav-link">NFTs</Link>
-            <Link to="/profile" className="nav-link active">Profile</Link>
-          </nav>
-
-          <div className="stats-container">
-            <div className="stat-badge coins">
-              <span className="stat-icon">🪙</span>
-            </div>
-            <div className="stat-badge stars">
-              <span className="stat-icon">⭐</span>
-              <span className="stat-value">{(Number(stars ?? 0)).toFixed(3)}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Shared Transparent Header */}
+      <SharedHeader />
 
       {/* Page Content */}
       <div className="profile-content">

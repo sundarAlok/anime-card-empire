@@ -27,7 +27,7 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, var(--profile-dark) 0%, #1e293b 50%, #0f172a 100%);
-  padding-top: 80px;
+  padding-top: 20px;
   padding-bottom: 2rem;
 }
 
@@ -107,6 +107,7 @@
   -webkit-text-fill-color: transparent;
   animation: profileTitleShimmer 3s linear infinite;
   margin-bottom: 0.5rem;
+  margin-top: 1rem;
 }
 
 @keyframes profileTitleShimmer {

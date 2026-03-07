@@ -84,8 +84,10 @@ export const GameProvider = ({ children }) => {
         stars,
         tapLimit,
         cards,
+        nfts,
         tap,
-        setCards
+        setCards,
+        setNfts
       }}
     >
       {children}

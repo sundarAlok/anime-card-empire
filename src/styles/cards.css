@@ -28,7 +28,7 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, var(--card-dark) 0%, #1e1b4b 50%, var(--card-dark) 100%);
-  padding-top: 80px;
+  padding-top: 20px;
   padding-bottom: 2rem;
 }
 
@@ -92,6 +92,7 @@
   -webkit-text-fill-color: transparent;
   animation: cardsTitleShimmer 3s linear infinite;
   margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
 }
 
 @keyframes cardsTitleShimmer {

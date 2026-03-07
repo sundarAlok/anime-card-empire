@@ -1,0 +1,226 @@
+/* ========================================
+   SHARED HEADER STYLES
+   Transparent Header with Game-Like Design
+   ======================================== */
+
+/* CSS Variables */
+:root {
+  --header-primary-color: #6366f1;
+  --header-primary-glow: rgba(99, 102, 241, 0.6);
+  --header-secondary-color: #8b5cf6;
+  --header-accent-yellow: #fbbf24;
+  --header-accent-yellow-glow: rgba(251, 191, 36, 0.5);
+  --header-accent-emerald: #34d399;
+  --header-accent-emerald-glow: rgba(52, 211, 153, 0.5);
+  --header-dark-bg: #0f172a;
+  --header-panel-bg: rgba(17, 24, 39, 0.85);
+  --header-border-glow: rgba(99, 102, 241, 0.4);
+  --header-text-primary: #ffffff;
+  --header-text-secondary: #a5b4fc;
+  --header-text-muted: #64748b;
+}
+
+/* ========================================
+   TRANSPARENT HEADER - With Top Gap
+   ======================================== */
+.header-transparent {
+  position: relative;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 2rem 1rem 2rem;
+  background: transparent !important;
+  backdrop-filter: none;
+  border: none;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header Stats (Stars & Coins) */
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 12px;
+  background: var(--header-panel-bg);
+  border: 1px solid;
+  backdrop-filter: blur(10px);
+  min-width: auto;
+  transition: all 0.3s ease;
+}
+
+.header-stats:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-stats.stars-earned {
+  border-color: rgba(251, 191, 36, 0.3);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+}
+
+.header-stats.coins-earned {
+  border-color: rgba(52, 211, 153, 0.3);
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.1);
+  justify-content: flex-end;
+}
+
+/* Stat Image - Same size as number */
+.stat-image {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+/* Stat Value - Same size as image */
+.stat-value {
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  color: var(--header-text-primary);
+  line-height: 1;
+}
+
+.stars-earned .stat-value {
+  color: var(--header-accent-yellow);
+  text-shadow: 0 0 10px var(--header-accent-yellow-glow);
+}
+
+.coins-earned .stat-value {
+  color: var(--header-accent-emerald);
+  text-shadow: 0 0 10px var(--header-accent-emerald-glow);
+}
+
+/* Hover Label - Hidden by default, shown on hover */
+.stat-label-hover {
+  display: none;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--header-text-secondary);
+  position: absolute;
+  top: -8px;
+  background: var(--header-panel-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.header-stats:hover .stat-label-hover {
+  display: block;
+}
+
+/* Navigation Tabs - Center (Bigger Size) */
+.nav-menu-center {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link-tab {
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--header-text-muted);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link-tab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--header-primary-color), var(--header-secondary-color));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 10px;
+  z-index: -1;
+}
+
+.nav-link-tab:hover {
+  color: var(--header-text-primary);
+  background: rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.nav-link-tab.active {
+  color: var(--header-text-primary);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+  border: 1px solid var(--header-border-glow);
+  box-shadow: 0 0 20px var(--header-primary-glow);
+}
+
+.nav-link-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--header-primary-color), transparent);
+  border-radius: 2px;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+  .header-transparent {
+    padding: 6px 1rem 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .header-stats {
+    min-width: auto;
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .stat-image {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem !important;
+  }
+  
+  .nav-menu-center {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+  
+  .nav-link-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-link-tab {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .header-stats {
+    padding: 0.25rem 0.4rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem !important;
+  }
+  
+  .stat-image {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+}
