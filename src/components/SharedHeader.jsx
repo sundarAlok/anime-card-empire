@@ -4,6 +4,19 @@ import starsImg from "../assets/common/stars.png";
 import coinsImg from "../assets/common/coins.png";
 import "../styles/SharedHeader.css";
 
+// Utility function to format large numbers (K for thousands, M for millions, B for billions)
+const formatLargeNumber = (value) => {
+  const num = Number(value ?? 0);
+  if (num >= 1e9) {
+    return (num / 1e9).toFixed(3) + 'B';
+  } else if (num >= 1e6) {
+    return (num / 1e6).toFixed(3) + 'M';
+  } else if (num >= 1e3) {
+    return (num / 1e3).toFixed(3) + 'K';
+  }
+  return num.toFixed(3);
+};
+
 const SharedHeader = () => {
   const { stars, coins } = useGame();
   const location = useLocation();
@@ -19,7 +32,7 @@ const SharedHeader = () => {
       <div className="header-stats stars-earned">
         <span className="stat-label-hover">Stars Earned</span>
         <img src={starsImg} alt="Stars" className="stat-image" />
-        <span className="stat-value">{Number(stars ?? 0).toFixed(3)}</span>
+        <span className="stat-value" style={{ fontSize: '1.5rem' }}>{formatLargeNumber(stars)}</span>
       </div>
 
       {/* Navigation Tabs - Center (Bigger Size) */}
@@ -32,7 +45,7 @@ const SharedHeader = () => {
 
       {/* Coins Earned - Right */}
       <div className="header-stats coins-earned">
-        <span className="stat-value">{Number(coins ?? 0).toLocaleString()}</span>
+        <span className="stat-value" style={{ fontSize: '1.5rem' }}>{formatLargeNumber(coins)}</span>
         <span className="stat-label-hover">Coins Earned</span>
         <img src={coinsImg} alt="Coins" className="stat-image" />
       </div>

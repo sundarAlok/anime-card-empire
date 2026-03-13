@@ -8,8 +8,17 @@ export const GameContext = createContext(null);
 
 export const GameProvider = ({ children }) => {
   // Core economy
-  const [coins, setCoins] = useState(0);
+  const [coins, setCoins] = useState(() => {
+    const saved = localStorage.getItem('coins');
+    return saved ? parseInt(saved, 10) : 0;
+  });
   const [stars, setStars] = useState(0);
+  
+  // Track highest coins ever earned (persisted in localStorage)
+  const [highestCoins, setHighestCoins] = useState(() => {
+    const saved = localStorage.getItem('highestCoins');
+    return saved ? parseInt(saved, 10) : 0;
+  });
 
   // Tap system
   const [tapLimit, setTapLimit] = useState(
@@ -30,6 +39,16 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     lastRefillTimeRef.current = Date.now();
   }, []);
+
+  // Persist coins to localStorage
+  useEffect(() => {
+    localStorage.setItem('coins', coins.toString());
+  }, [coins]);
+
+  // Persist highestCoins to localStorage
+  useEffect(() => {
+    localStorage.setItem('highestCoins', highestCoins.toString());
+  }, [highestCoins]);
 
   // 🔥 TAP REFILL ENGINE
   useEffect(() => {
@@ -73,7 +92,12 @@ export const GameProvider = ({ children }) => {
   const tap = () => {
     if (tapLimit <= 0) return;
 
-    setCoins(prev => prev + 1);
+    setCoins(prev => {
+      const newAmount = prev + 1;
+      // Update highest coins when earning
+      setHighestCoins(highest => Math.max(highest, newAmount));
+      return newAmount;
+    });
     setTapLimit(prev => prev - 1);
   };
 
@@ -81,13 +105,16 @@ export const GameProvider = ({ children }) => {
     <GameContext.Provider
       value={{
         coins,
+        setCoins,
         stars,
+        highestCoins,
         tapLimit,
         cards,
         nfts,
         tap,
         setCards,
-        setNfts
+        setNfts,
+        setHighestCoins
       }}
     >
       {children}

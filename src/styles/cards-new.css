@@ -1,0 +1,1036 @@
+/* ========================================
+   ANIME CARD EMPIRE - CARDS PAGE
+   Updated: starter=gray, rare=blue, epic=green, legendary=gold, mythic=purple
+   ======================================== */
+
+:root {
+  --card-primary: #6366f1;
+  --card-primary-glow: rgba(99, 102, 241, 0.6);
+  --card-secondary: #8b5cf6;
+  
+  /* Tier Colors */
+  --card-starter: #cbd0da;      /* Gray */
+  --card-rare: #297bff;        /* Blue */
+  --card-epic: #24f06f;        /* Green */
+  --card-legendary: #ffc20b;   /* Gold */
+  --card-mythic: rgb(193, 59, 255);      /* Purple */
+  
+  
+  --card-dark: #0f172a;
+  --card-dark-secondary: #1e293b;
+  --card-text-primary: #ffffff;
+  --card-text-secondary: #94a3b8;
+}
+
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
+.cards-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: linear-gradient(135deg, var(--card-dark) 0%, #1e1b4b 50%, var(--card-dark) 100%);
+  padding-top: 20px;
+  padding-bottom: 2rem;
+}
+
+.cards-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.cards-grid-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background-image: 
+    linear-gradient(var(--card-primary-glow) 1px, transparent 1px),
+    linear-gradient(90deg, var(--card-primary-glow) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.cards-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+}
+
+.cards-glow-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--card-primary-glow) 0%, transparent 70%);
+  top: -150px;
+  left: -100px;
+  animation: cardsGlowFloat 10s ease-in-out infinite;
+}
+
+.cards-glow-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
+  bottom: -100px;
+  right: -100px;
+  animation: cardsGlowFloat 12s ease-in-out infinite reverse;
+}
+
+@keyframes cardsGlowFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -30px); }
+}
+
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+.cards-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 0 2rem;
+  margin-top: 3.5rem;
+}
+
+.cards-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--card-text-primary);
+  margin-bottom: 0.75rem;
+  text-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+  letter-spacing: -1px;
+}
+
+.cards-subtitle {
+  font-size: 1rem;
+  color: var(--card-text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   CATEGORY TABS
+   ======================================== */
+.category-tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 3.3rem;
+  padding: 0 1rem;
+  flex-wrap: wrap;
+}
+
+.category-tab {
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border: 1.5px solid rgba(99, 102, 241, 0.2);
+  border-radius: 10px;
+  color: var(--card-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.category-tab:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  transform: translateY(-2px);
+}
+
+.category-tab.active {
+  background: linear-gradient(135deg, var(--card-primary) 0%, var(--card-secondary) 100%);
+  border-color: #b181fd;
+  color: white;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+/* Category-specific active colors */
+.category-tab.starter.active {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border-color: #9ca3af;
+  box-shadow: 0 6px 16px rgba(156, 163, 175, 0.4);
+}
+
+.category-tab.rare.active {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #3b82f6;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.category-tab.epic.active {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  border-color: #22c55e;
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+}
+
+.category-tab.legendary.active {
+  background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%);
+  border-color: #eab308;
+  box-shadow: 0 6px 16px rgba(234, 179, 8, 0.4);
+}
+
+.category-tab.mythic.active {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+  border-color: #a855f7;
+  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+}
+
+/* ========================================
+   ALL TIERS CONTAINER
+   ======================================== */
+.all-tiers-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ========================================
+   TIER SECTIONS
+   ======================================== */
+.tier-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.tier-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  backdrop-filter: none;
+}
+
+.tier-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.tier-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--card-text-secondary);
+  background: rgba(99, 102, 241, 0.15);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+}
+
+/* Tier-specific header colors */
+.tier-section.tier-starter .tier-title {
+  color: var(--card-starter);
+  text-shadow: 0 0 20px rgba(156, 163, 175, 0.5);
+}
+
+.tier-section.tier-rare .tier-title {
+  color: var(--card-rare);
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+.tier-section.tier-epic .tier-title {
+  color: var(--card-epic);
+  text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+.tier-section.tier-legendary .tier-title {
+  color: var(--card-legendary);
+  text-shadow: 0 0 20px rgba(234, 179, 8, 0.5);
+}
+
+.tier-section.tier-mythic .tier-title {
+  color: var(--card-mythic);
+  text-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+}
+
+/* Tier-specific border colors - stronger for each section */
+.tier-section.tier-starter {
+  border-color: rgba(156, 163, 175, 0.4);
+}
+
+.tier-section.tier-rare {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.tier-section.tier-epic {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.tier-section.tier-legendary {
+  border-color: rgba(234, 179, 8, 0.4);
+}
+
+.tier-section.tier-mythic {
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.tier-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+/* ========================================
+   CARDS GRID (for filtered view)
+   ======================================== */
+.cards-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  padding: 0 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   CARD ITEM
+   ======================================== */
+.card-item {
+  display: flex;
+  flex-direction: column;
+  height: 280px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border: 2px solid rgba(99, 102, 241, 0.25);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(99, 102, 241, 0.1);
+}
+
+/* Rarity-specific border colors */
+.card-item.starter {
+  border-color: rgba(156, 163, 175, 0.4);
+}
+
+.card-item.rare {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.card-item.epic {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.card-item.legendary {
+  border-color: rgba(234, 179, 8, 0.4);
+}
+
+.card-item.mythic {
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+/* Only show hover effects when card is enabled (not disabled) */
+.card-item:hover:not(.disabled) {
+  border-color: #fff;
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.card-item.starter:hover:not(.disabled) {
+  border-color: var(--card-starter);
+  box-shadow: 0 15px 35px rgba(156, 163, 175, 0.3), 0 0 20px rgba(156, 163, 175, 0.2);
+}
+
+.card-item.rare:hover:not(.disabled) {
+  border-color: var(--card-rare);
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.card-item.epic:hover:not(.disabled) {
+  border-color: var(--card-epic);
+  box-shadow: 0 15px 35px rgba(34, 197, 94, 0.3), 0 0 20px rgba(34, 197, 94, 0.2);
+}
+
+.card-item.legendary:hover:not(.disabled) {
+  border-color: var(--card-legendary);
+  box-shadow: 0 15px 35px rgba(234, 179, 8, 0.35), 0 0 25px rgba(234, 179, 8, 0.25);
+}
+
+.card-item.mythic:hover:not(.disabled) {
+  border-color: var(--card-mythic);
+  box-shadow: 0 15px 35px rgba(168, 85, 247, 0.4), 0 0 30px rgba(168, 85, 247, 0.3);
+}
+
+/* ========================================
+   IMAGE WRAPPER - 55%
+   ======================================== */
+.card-image-wrapper {
+  flex: 0 0 55%;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.card-item.starter .card-image-wrapper {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.15) 0%, rgba(107, 114, 128, 0.05) 100%);
+}
+
+.card-item.rare .card-image-wrapper {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%);
+}
+
+.card-item.epic .card-image-wrapper {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.05) 100%);
+}
+
+.card-item.legendary .card-image-wrapper {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(202, 138, 4, 0.05) 100%);
+}
+
+.card-item.mythic .card-image-wrapper {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(147, 51, 234, 0.08) 100%);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card-item:hover .card-image {
+  transform: scale(1.05);
+}
+
+.card-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.5) 100%);
+  pointer-events: none;
+}
+
+/* ========================================
+   RARITY BADGE - TOP RIGHT
+   ======================================== */
+.card-rarity-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 0.35rem 0.7rem;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1.5px solid;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card-rarity-badge.starter {
+  color: var(--card-starter);
+  border-color: var(--card-starter);
+  text-shadow: 0 0 8px rgba(156, 163, 175, 0.5);
+}
+
+.card-rarity-badge.rare {
+  color: var(--card-rare);
+  border-color: var(--card-rare);
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.card-rarity-badge.epic {
+  color: var(--card-epic);
+  border-color: var(--card-epic);
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.card-rarity-badge.legendary {
+  color: var(--card-legendary);
+  border-color: var(--card-legendary);
+  text-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+}
+
+.card-rarity-badge.mythic {
+  color: var(--card-mythic);
+  border-color: var(--card-mythic);
+  text-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+}
+
+/* ========================================
+   CONTENT SECTION - 45%
+   ======================================== */
+.card-content-section {
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.95) 100%);
+  position: relative;
+  border-top: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+/* ========================================
+   CARD HEADER - NAME + INFO BTN
+   ======================================== */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.card-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--card-text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  line-height: 1.2;
+}
+
+/* INFO BUTTON - TIER COLORS */
+.card-info-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Starter tier - gray */
+.card-item.starter .card-info-btn {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.4) 0%, rgba(107, 114, 128, 0.3) 100%);
+  border: 1.5px solid rgba(156, 163, 175, 0.7);
+  color: var(--card-starter);
+}
+
+/* Rare tier - blue */
+.card-item.rare .card-info-btn {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(37, 99, 235, 0.3) 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.7);
+  color: var(--card-rare);
+}
+
+/* Epic tier - green */
+.card-item.epic .card-info-btn {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.4) 0%, rgba(22, 163, 74, 0.3) 100%);
+  border: 1.5px solid rgba(34, 197, 94, 0.7);
+  color: var(--card-epic);
+}
+
+/* Legendary tier - gold */
+.card-item.legendary .card-info-btn {
+  background: linear-gradient(135deg, rgba(255, 194, 11, 0.4) 0%, rgba(251, 191, 36, 0.3) 100%);
+  border: 1.5px solid rgba(255, 194, 11, 0.7);
+  color: var(--card-legendary);
+}
+
+/* Mythic tier - purple */
+.card-item.mythic .card-info-btn {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(147, 51, 234, 0.3) 100%);
+  border: 1.5px solid rgba(168, 85, 247, 0.7);
+  color: var(--card-mythic);
+}
+
+.card-info-btn:hover {
+  transform: scale(1.1);
+}
+
+.card-item.starter .card-info-btn:hover {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.5) 0%, rgba(107, 114, 128, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(156, 163, 175, 0.5);
+}
+
+.card-item.rare .card-info-btn:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(37, 99, 235, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.card-item.epic .card-info-btn:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.5) 0%, rgba(22, 163, 74, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.card-item.legendary .card-info-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 194, 11, 0.5) 0%, rgba(251, 191, 36, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(255, 194, 11, 0.5);
+}
+
+.card-item.mythic .card-info-btn:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.5) 0%, rgba(147, 51, 234, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+/* ========================================
+   STATS ROW - REWARD + LEVEL
+   ======================================== */
+.card-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-bottom: 0.45rem;
+  padding: 0.45rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border-radius: 7px;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.card-reward {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.reward-icon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.reward-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--card-text-primary);
+}
+
+/* LEVEL DISPLAY - TIER COLORS */
+.card-level-display {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.25rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Starter tier - gray */
+.card-item.starter .card-level-display {
+  color: var(--card-starter);
+  background: rgba(156, 163, 175, 0.15);
+  text-shadow: 0 1px 2px rgba(156, 163, 175, 0.3);
+}
+
+/* Rare tier - blue */
+.card-item.rare .card-level-display {
+  color: var(--card-rare);
+  background: rgba(59, 130, 246, 0.15);
+  text-shadow: 0 1px 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Epic tier - green */
+.card-item.epic .card-level-display {
+  color: var(--card-epic);
+  background: rgba(34, 197, 94, 0.15);
+  text-shadow: 0 1px 2px rgba(34, 197, 94, 0.3);
+}
+
+/* Legendary tier - gold */
+.card-item.legendary .card-level-display {
+  color: var(--card-legendary);
+  background: rgba(255, 194, 11, 0.15);
+  text-shadow: 0 1px 2px rgba(255, 194, 11, 0.3);
+}
+
+/* Mythic tier - purple */
+.card-item.mythic .card-level-display {
+  color: var(--card-mythic);
+  background: rgba(168, 85, 247, 0.15);
+  text-shadow: 0 1px 2px rgba(168, 85, 247, 0.3);
+}
+
+/* ========================================
+   UPGRADE BUTTON
+   ======================================== */
+.card-upgrade-btn {
+  flex: 1;
+  padding: 0.55rem 0.65rem;
+  background: linear-gradient(135deg, var(--card-primary) 0%, var(--card-secondary) 100%);
+  border: none;
+  border-radius: 7px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+/* Upgrade button colors per tier */
+.card-item.starter .card-upgrade-btn {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+}
+
+.card-item.rare .card-upgrade-btn {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.card-item.epic .card-upgrade-btn {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+}
+
+.card-item.legendary .card-upgrade-btn {
+  background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%);
+  box-shadow: 0 4px 12px rgba(202, 138, 4, 0.4);
+}
+
+.card-item.mythic .card-upgrade-btn {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+}
+
+.upgrade-btn-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.card-upgrade-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-upgrade-btn:hover:not(.disabled):not(.max-level) {
+  transform: translateY(-2px);
+}
+
+.card-item.starter .card-upgrade-btn:hover:not(.disabled):not(.max-level) {
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.5);
+}
+
+.card-item.rare .card-upgrade-btn:hover:not(.disabled):not(.max-level) {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+.card-item.epic .card-upgrade-btn:hover:not(.disabled):not(.max-level) {
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
+}
+
+.card-item.legendary .card-upgrade-btn:hover:not(.disabled):not(.max-level) {
+  box-shadow: 0 6px 20px rgba(202, 138, 4, 0.5);
+}
+
+.card-item.mythic .card-upgrade-btn:hover:not(.disabled):not(.max-level) {
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.5);
+}
+
+.card-upgrade-btn:hover:not(.disabled):not(.max-level)::before {
+  opacity: 1;
+}
+
+.card-upgrade-btn.max-level {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(16, 185, 129, 0.2) 100%);
+  color: #10b981;
+  border: 1px solid #10b981;
+  cursor: not-allowed;
+  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.2);
+}
+
+.card-upgrade-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   INFO TOOLTIP - IMPROVED DESIGN
+   ======================================== */
+.card-info-tooltip {
+  position: fixed;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(20, 35, 55, 0.95) 100%);
+  border-radius: 16px;
+  padding: 0;
+  z-index: 10001;
+  min-width: 280px;
+  max-width: 300px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(20px);
+  pointer-events: auto;
+  animation: tooltipSlideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  border: 1px solid #a2a4a7;
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.info-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.info-tooltip-header {
+  margin-bottom: 0.75rem;
+}
+
+.info-tooltip-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.info-tooltip-anime {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ff41b6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.95;
+}
+
+.info-tooltip-desc {
+  font-size: 0.85rem;
+  color: var(--card-text-secondary);
+  line-height: 1.5;
+  font-weight: 400;
+  /* margin-bottom: 0.3rem; */
+}
+
+.info-tooltip-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(99, 101, 241, 0.175), rgba(99, 102, 241, 0.4), rgba(99, 101, 241, 0.175));
+  margin: 0.5rem 0 0.75rem 0;
+}
+
+.info-tooltip-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-tooltip-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--card-text-primary);
+  line-height: 1.4;
+}
+
+.detail-bullet {
+  color: var(--card-primary);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  flex: 1;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+.empty-state {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--card-text-primary);
+  margin: 0;
+}
+
+.empty-text {
+  font-size: 1rem;
+  color: var(--card-text-secondary);
+  margin: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1200px) {
+  .cards-grid,
+  .tier-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .cards-grid,
+  .tier-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-grid,
+  .tier-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+  
+  .card-item {
+    height: 260px;
+  }
+  
+  .cards-title {
+    font-size: 2rem;
+  }
+  
+  .cards-header {
+    margin-bottom: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .category-tabs {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .category-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .tier-title {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .cards-grid,
+  .tier-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    padding: 0 0.75rem;
+  }
+  
+  .card-item {
+    height: 240px;
+  }
+  
+  .card-name {
+    font-size: 0.65rem;
+  }
+  
+  .card-content-section {
+    padding: 0.55rem;
+  }
+  
+  .card-stats-row {
+    padding: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+  
+  .reward-value {
+    font-size: 0.6rem;
+  }
+  
+  .card-level-display {
+    font-size: 0.55rem;
+  }
+  
+  .card-upgrade-btn {
+    font-size: 0.6rem;
+    padding: 0.45rem 0.5rem;
+  }
+  
+  .upgrade-btn-icon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .card-info-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 0.55rem;
+  }
+  
+  .card-info-tooltip {
+    min-width: 280px;
+    max-width: 300px;
+  }
+  
+  .tier-header {
+    padding: 0.5rem 1rem;
+  }
+  
+  .tier-title {
+    font-size: 1rem;
+  }
+  
+  .tier-count {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .cards-grid,
+  .tier-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .card-item {
+    height: 220px;
+  }
+}
