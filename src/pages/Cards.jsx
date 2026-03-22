@@ -198,10 +198,24 @@ const Cards = () => {
   };
 
   const getCardReward = (card, level) => {
+
     const isCoinReward = level <= 3;
-    const rewardArray = isCoinReward ? card.rewards.coin : card.rewards.star;
-    const rewardValue = rewardArray[level - 1] || 0;
-    return { type: isCoinReward ? "coins" : "stars", value: rewardValue, image: isCoinReward ? coinsImg : starsImg };
+
+    const rewardArray = isCoinReward
+      ? card.rewards.coin
+      : card.rewards.star;
+
+    const index = isCoinReward
+      ? level - 1     // coins: levels 1–3
+      : level - 4;    // stars: levels 4–10
+
+    const rewardValue = rewardArray[index] ?? 0;
+
+    return {
+      type: isCoinReward ? "coins" : "stars",
+      value: rewardValue,
+      image: isCoinReward ? coinsImg : starsImg
+    };
   };
 
   const handleInfoHover = (e, card) => {
