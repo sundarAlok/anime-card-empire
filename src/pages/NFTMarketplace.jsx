@@ -548,7 +548,7 @@ const NFTMarketplace = () => {
       <div className="nft-header">
         <h1 className="nft-title">NFT Marketplace</h1>
         <p className="nft-subtitle">
-          Purchase exclusive <span className="nft-highlight">NFTs</span> with your earned stars. 
+          Purchase exclusive NFTs with your earned stars. 
           Collect and trade your favorite anime heroes in a premium showcase!
         </p>
       </div>
@@ -710,7 +710,7 @@ const NFTMarketplace = () => {
             <div className="reward-right">
               <h2 className="reward-title">🎉 Achievement Unlocked!</h2>
 
-              <h3>{rewardPopup.nft.name}</h3>
+              <h3 className="reward-character">{rewardPopup.nft.name}</h3>
               <p className="reward-anime">{rewardPopup.nft.anime}</p>
 
               <p className="reward-info">{rewardPopup.nft.info}</p>

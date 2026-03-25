@@ -119,17 +119,14 @@ const Home = () => {
 
           </div>
 
-          {/* Coins per Tap */}
-          <div className="coins-per-tap">
-            Coins per tap: +<span>{coinsPerTap}</span>
-          </div>
 
           {/* Tap Limit */}
           <div className="tap-limit-container">
-
-            <span className="tap-limit-text">
-              {tapLimit} / {maxTaps}
-            </span>
+            
+            {/* Coins per Tap */}
+            <div className="coins-per-tap">
+              <span className="tap-limit-label">COINS / TAP: </span><span> {coinsPerTap}</span>
+            </div>
 
             <div className="tap-limit-bar">
 
@@ -140,7 +137,10 @@ const Home = () => {
 
             </div>
 
-            <span className="tap-limit-label">Tap Limit</span>
+              <span className="tap-limit-text">
+                <span className="tap-limit-label">Tap Limit: </span> {tapLimit} / {maxTaps}
+              </span>            
+            
 
           </div>
 
