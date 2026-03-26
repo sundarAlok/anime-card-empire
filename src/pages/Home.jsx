@@ -4,6 +4,8 @@ import { useGame } from "../context/useGame";
 import tapImg from "../assets/tap.png";
 import SharedHeader from "../components/SharedHeader";
 import "../styles/home.css";
+import StreakOverlay from "../components/StreakOverlay";
+
 
 /* Coins per tap table (Level Guide) */
 const TAP_LEVEL_DATA = [
@@ -27,13 +29,16 @@ const TAP_LEVEL_DATA = [
 
 const Home = () => {
 
-  const { coins, tapLimit, tap, coinsPerTap, level } = useGame();
+  const { coins, tapLimit, tap, coinsPerTap, level, streakDays } = useGame();
+
 
   const maxTaps = 100;
   const tapPercentage = (tapLimit / maxTaps) * 100;
 
   const [showInfo, setShowInfo] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const [showStreak, setShowStreak] = useState(false);
+
 
   const iconRef = useRef(null);
 
@@ -73,78 +78,100 @@ const Home = () => {
 
         <h1 className="main-title">Anime Card Empire</h1>
 
-        <div className="tap-section">
-
-          {/* Title Row */}
-          <div className="tap-title-row">
-
-            <h2 className="tap-title">Tap to Earn</h2>
-
-            <span
-              ref={iconRef}
-              className="tap-info-icon"
-              onMouseEnter={() => setShowInfo(true)}
-              onMouseLeave={() => setShowInfo(false)}
-            >
-              i
-            </span>
-
+        <div className="home-sections">
+<div className="section-left">
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-1"></div>
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-2"></div>
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-3"></div>
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-4"></div>
           </div>
+          <div className="section-center">
+            <div className="tap-section">
 
-          <p className="tap-subtitle">
-            Tap the button to earn coins and upgrade your cards to generate stars.
-          </p>
+              {/* Title Row */}
+              <div className="tap-title-row">
 
-          {/* Tap Button */}
-          <div className="tap-button-container">
+                <h2 className="tap-title">Tap to Earn</h2>
 
-            <div className="tap-outer-glow" />
+                <span
+                  ref={iconRef}
+                  className="tap-info-icon"
+                  onMouseEnter={() => setShowInfo(true)}
+                  onMouseLeave={() => setShowInfo(false)}
+                >
+                  i
+                </span>
 
-            <button
-              className="tap-button"
-              onClick={tap}
-              disabled={tapLimit <= 0}
-            >
+              </div>
 
-              <img
-                src={tapImg}
-                alt="Tap"
-                className="tap-button-image"
-              />
+              <p className="tap-subtitle">
+                Tap the button to earn coins and upgrade your cards to generate stars.
+              </p>
 
-              <div className="tap-button-overlay tap-shine" />
-              <div className="tap-button-overlay tap-reflection" />
+              {/* Tap Button */}
+              <div className="tap-button-container">
 
-            </button>
+                <div className="tap-outer-glow" />
 
-          </div>
+                <button
+                  className="tap-button"
+                  onClick={tap}
+                  disabled={tapLimit <= 0}
+                >
+
+                  <img
+                    src={tapImg}
+                    alt="Tap"
+                    className="tap-button-image"
+                  />
+
+                  <div className="tap-button-overlay tap-shine" />
+                  <div className="tap-button-overlay tap-reflection" />
+
+                </button>
+
+              </div>
 
 
-          {/* Tap Limit */}
-          <div className="tap-limit-container">
-            
-            {/* Coins per Tap */}
-            <div className="coins-per-tap">
-              <span className="tap-limit-label">COINS / TAP: </span><span> {coinsPerTap}</span>
+              {/* Tap Limit */}
+              <div className="tap-limit-container">
+                
+                {/* Coins per Tap */}
+                <div className="coins-per-tap">
+                  <span className="tap-limit-label">COINS / TAP: </span><span> {coinsPerTap}</span>
+                </div>
+
+                <div className="tap-limit-bar">
+
+                  <div
+                    className={`tap-limit-fill ${getTapLimitColor()}`}
+                    style={{ width: `${tapPercentage}%` }}
+                  />
+
+                </div>
+
+                  <span className="tap-limit-text">
+                    <span className="tap-limit-label">Tap Limit: </span> {tapLimit} / {maxTaps}
+                  </span>              
+
+              </div>
+
             </div>
-
-            <div className="tap-limit-bar">
-
-              <div
-                className={`tap-limit-fill ${getTapLimitColor()}`}
-                style={{ width: `${tapPercentage}%` }}
-              />
-
-            </div>
-
-              <span className="tap-limit-text">
-                <span className="tap-limit-label">Tap Limit: </span> {tapLimit} / {maxTaps}
-              </span>            
-            
-
           </div>
-
+          <div className="section-right">
+            {/* Streak Badge */}
+            <div className="streak-badge section-1" onClick={() => setShowStreak(true)}>
+              <span className="streak-emoji">🔥</span>
+              <span className="streak-days">{streakDays}</span>
+            </div>
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-2"></div>
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-3"></div>
+            <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-4"></div>
+          </div>
+        
         </div>
+
+
 
       </main>
 
@@ -153,11 +180,12 @@ const Home = () => {
       {showInfo && createPortal(
 
         <div
-          className="game-info-tooltip"
+className="game-info-tooltip"
           style={{
             position: "fixed",
-            top: tooltipPosition.top,
-            left: tooltipPosition.left
+            top: tooltipPosition.top - 80,
+            left: tooltipPosition.left - 50,
+            zIndex: 10000
           }}
           onMouseEnter={() => setShowInfo(true)}
           onMouseLeave={() => setShowInfo(false)}
@@ -171,7 +199,7 @@ const Home = () => {
 
           {/* Description */}
           <p className="game-info-desc">
-            Tap the button to earn coins. Upgrade cards to generate stars per hour.
+            Tap the button to earn coins. Upgrade cards to generate coins and stars per hour.
             Use stars to buy NFTs and grow your anime empire.
           </p>
 
@@ -179,19 +207,19 @@ const Home = () => {
           <div className="game-flow">
 
             <div className="flow-step">
-              Tap → Earn Coins
+              Home: Tap → Earn Coins & Make Streak
             </div>
 
             <div className="flow-step">
-              Upgrade Cards → Generate Stars
+              Cards: Upgrade Cards → Generate Coins & Stars
             </div>
 
             <div className="flow-step">
-              Spend Stars → Buy NFTs
+              NFTs: Spend Stars → Buy NFTs
             </div>
 
             <div className="flow-step">
-              Track Everything → Profile Page
+              Profile: Track Everything → Profile Page
             </div>
 
           </div>
@@ -231,6 +259,9 @@ const Home = () => {
         document.body
 
       )}
+
+      <StreakOverlay isOpen={showStreak} onClose={() => setShowStreak(false)} />
+
 
 
     </div>

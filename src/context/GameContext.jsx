@@ -63,17 +63,62 @@ export const GameProvider = ({ children }) => {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  // const [stars, setStars] = useState(() => {
-  //   const saved = localStorage.getItem("stars");
-  //   return saved ? parseFloat(saved) : 0;
-  // });
-
   const [stars, setStars] = useState(99999);
 
   const [highestCoins, setHighestCoins] = useState(() => {
     const saved = localStorage.getItem("highestCoins");
     return saved ? parseInt(saved, 10) : 0;
   });
+
+  /* -----------------------------
+     STREAK SYSTEM
+  --------------------------------*/
+
+  const [streakDays, setStreakDays] = useState(() => {
+    const saved = localStorage.getItem("streakDays");
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  const [lastClaimDate, setLastClaimDate] = useState(() => {
+    return localStorage.getItem("lastClaimDate") || null;
+  });
+
+  const MILestones = [7, 30, 90, 180, 365];
+
+  const getDailyStreakReward = () => {
+    const baseReward = 100;
+    const multiplier = Math.pow(1.07, streakDays);
+    return Math.floor(baseReward * multiplier);
+  };
+
+  const isNewDay = () => {
+    const today = new Date().toDateString();
+    return lastClaimDate !== today;
+  };
+
+  const claimStreak = () => {
+    if (!isNewDay()) return 0;
+
+    const dailyReward = getDailyStreakReward();
+    let extraReward = 0;
+
+    // Check milestone
+    if (MILestones.includes(streakDays + 1)) {
+      extraReward = dailyReward * 100;
+    }
+
+    const totalReward = dailyReward + extraReward;
+
+    setCoins(prev => prev + totalReward);
+    setStreakDays(prev => prev + 1);
+    setLastClaimDate(new Date().toDateString());
+    
+    localStorage.setItem("streakDays", (streakDays + 1).toString());
+    localStorage.setItem("lastClaimDate", new Date().toDateString());
+
+    return totalReward;
+  };
+
 
   /* -----------------------------
      TAP LIMIT SYSTEM
@@ -136,6 +181,11 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("highestCoins", highestCoins.toString());
   }, [highestCoins]);
+
+  useEffect(() => {
+    localStorage.setItem("streakDays", streakDays.toString());
+  }, [streakDays]);
+
 
   /* -----------------------------
      TAP REFILL ENGINE
@@ -237,10 +287,15 @@ export const GameProvider = ({ children }) => {
         level,
         setCards,
         setNfts,
-        setHighestCoins
+        setHighestCoins,
+        streakDays,
+        lastClaimDate,
+        getDailyStreakReward,
+        claimStreak
       }}
     >
       {children}
     </GameContext.Provider>
   );
 };
+

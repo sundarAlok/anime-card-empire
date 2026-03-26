@@ -8,6 +8,11 @@ import cardsImg from "../assets/profile/cards.png";
 import berryImg from "../assets/profile/berry.png";
 import maxCoinImg from "../assets/profile/max-coin.png";
 import achievementsImg from "../assets/profile/achievements.png";
+import richestImg from "../assets/profile/richest.png";
+import legendImg from "../assets/profile/legend.png";
+import veteranImg from "../assets/profile/veteran.png";
+import vipImg from "../assets/profile/vip.png";
+
 import "../styles/profile.css";
 import "../styles/home.css";
 import "../styles/SharedHeader.css";
@@ -17,15 +22,15 @@ const COIN_ACHIEVEMENTS = [
   { id: "coins_100", name: "100 Coins", threshold: 100, icon: coinsImg },
   { id: "coins_2k", name: "2K Coins", threshold: 2000, icon: coinsImg },
   { id: "coins_10k", name: "10K Coins", threshold: 10000, icon: coinsImg },
-  { id: "coins_50k", name: "50K Coins", threshold: 50000, icon: coinsImg },
-  { id: "coins_master", name: "Coin Minister", threshold: 100000, icon: coinsImg },
+  { id: "coins_50k", name: "70K Coins", threshold: 70000, icon: coinsImg },
+  { id: "coins_master", name: "Coin Minister", threshold: 150000, icon: coinsImg },
 ];
 
 const CARD_ACHIEVEMENTS = [
   { id: "cards_1", name: "First Card", threshold: 1, icon: cardsImg },
   { id: "cards_3", name: "3 Cards", threshold: 3, icon: cardsImg },
   { id: "cards_7", name: "7 Cards", threshold: 7, icon: cardsImg },
-  { id: "cards_11", name: "11 Cards", threshold: 11, icon: cardsImg },
+  { id: "cards_11", name: "12 Cards", threshold: 12, icon: cardsImg },
   { id: "cards_master", name: "Card Master", threshold: 21, icon: cardsImg },
 ];
 
@@ -40,9 +45,9 @@ const NFT_ACHIEVEMENTS = [
 const STAR_ACHIEVEMENTS = [
   { id: "stars_11", name: "11 Stars", threshold: 11, icon: starsImg },
   { id: "stars_108", name: "108 Stars", threshold: 108, icon: starsImg },
-  { id: "stars_300", name: "300 Stars", threshold: 300, icon: starsImg },
-  { id: "stars_700", name: "700 Stars", threshold: 700, icon: starsImg },
-  { id: "stars_lord", name: "Star Lord", threshold: 1500, icon: starsImg },
+  { id: "stars_300", name: "3K Stars", threshold: 3000, icon: starsImg },
+  { id: "stars_700", name: "10K Stars", threshold: 10000, icon: starsImg },
+  { id: "stars_lord", name: "Star Lord", threshold: 50000, icon: starsImg },
 ];
 
 const STREAK_ACHIEVEMENTS = [
@@ -59,25 +64,25 @@ const SPECIAL_ACHIEVEMENTS = [
     id: "richest", 
     name: "Richest", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 2000 && stars >= 108 && cardCount >= 3 && nftCount >= 3,
-    icon: "💰"
+    icon: {richestImg}
   },
   { 
     id: "legend", 
     name: "Legend", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 10000 && stars >= 300 && cardCount >= 7 && nftCount >= 7,
-    icon: "👑"
+    icon: {legendImg}
   },
   { 
     id: "veteran", 
     name: "Veteran", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 50000 && stars >= 700 && cardCount >= 11 && nftCount >= 11,
-    icon: "🎖️"
+    icon: {veteranImg}
   },
   { 
     id: "vip", 
     name: "VIP", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 100000 && stars >= 1500 && cardCount >= 21 && nftCount >= 17,
-    icon: "✨"
+    icon: {vipImg}
   },
 ];
 
