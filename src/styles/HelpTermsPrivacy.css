@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg-dark: #0b0f14;
+  --bg-surface: #121821;
+  --emerald: #00e08a;
+  --emerald-strong: #00ff9d;
+  --emerald-soft: rgba(0, 224, 138, 0.15);
+  --border: rgba(255,255,255,0.08);
+  --text: #e6edf3;
+  --text-dim: #9aa4af;
+}
+
+/* OVERLAY */
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 12, 0.88);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* MODAL */
+.edit-modal {
+  width: 95vw;
+  max-width: 820px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(180deg, #121821, #0b0f14);
+  border-radius: 22px;
+  border: 1px solid var(--border);
+
+  box-shadow:
+    0 40px 120px rgba(0,0,0,0.9),
+    0 0 80px rgba(0,224,138,0.08);
+
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+/* HEADER */
+.edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 2rem 2.4rem;
+  border-bottom: 1px solid var(--border);
+
+  background: linear-gradient(90deg, rgba(0,224,138,0.12), transparent);
+}
+
+.edit-header h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+
+  color: var(--emerald-strong);
+  text-shadow: 0 0 20px rgba(0,255,157,0.25);
+}
+
+/* CLOSE BUTTON */
+.edit-close {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.edit-close:hover {
+  background: rgba(0,224,138,0.15);
+  color: var(--emerald-strong);
+  border-color: var(--emerald);
+  box-shadow: 0 0 20px var(--emerald-soft);
+}
+
+/* BODY (SCROLL FIXED) */
+.edit-body {
+  overflow-y: auto;
+  flex: 1;
+
+  padding: 2rem 0.6rem 2.4rem 2.2rem; /* right padding smaller = scrollbar gap */
+  scroll-behavior: smooth;
+}
+
+/* CONTENT */
+.prose {
+  color: var(--text-dim);
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+/* MAIN TITLES */
+.prose h4 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--emerald-strong);
+
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+
+  border-left: 3px solid var(--emerald);
+  padding-left: 0.7rem;
+}
+
+/* SUB TITLES */
+.prose h5 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+
+  margin-top: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* TEXT */
+.prose p {
+  margin-bottom: 1rem;
+}
+
+/* SECTIONS / CARDS */
+.bg-white\/5 {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(0, 224, 138, 0.25);
+  border-radius: 14px;
+
+  padding: 0.2rem 1.2rem;
+  margin-right: 0.5rem;
+  margin-bottom: 1rem;
+
+  backdrop-filter: blur(6px);
+
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.bg-white\/5:hover {
+  border-color: rgba(0, 255, 157, 0.6);
+
+  box-shadow:
+    0 0 0 1px rgba(0,255,157,0.2),
+    0 10px 30px rgba(0, 224, 138, 0.15);
+}
+
+/* FAQ */
+.faq-item {
+  border: 1px solid rgba(0, 224, 138, 0.25);
+  border-radius: 12px;
+
+  padding: 0.2rem 1.2rem;
+  margin-bottom: 0.9rem;
+
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.faq-item:hover {
+  border-color: rgba(0, 255, 157, 0.6);
+
+  box-shadow:
+    0 0 0 1px rgba(0,255,157,0.2),
+    0 8px 25px rgba(0,224,138,0.12);
+}
+
+/* FAQ TEXT */
+.faq-item strong {
+  color: var(--emerald-strong);
+  font-size: 1.05rem;
+}
+
+/* BUTTON */
+.edit-cancel {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 1rem;
+  margin-right: 0.5rem;
+  border-radius: 14px;
+  border: none;
+
+  background: linear-gradient(135deg, #00e08a, #00c97a);
+  color: #03291a;
+
+  font-weight: 700;
+  font-size: 1rem;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.edit-cancel:hover {
+  box-shadow:
+    0 20px 50px rgba(0,224,138,0.45);
+}
+
+/* SCROLLBAR (CLEAN + SPACING) */
+.edit-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.edit-body::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 10px 0;
+}
+
+.edit-body::-webkit-scrollbar-thumb {
+  background: rgba(0,224,138,0.35);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.edit-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,224,138,0.6);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .edit-modal {
+    max-width: 95vw;
+  }
+
+  .edit-header h3 {
+    font-size: 1.4rem;
+  }
+
+  .edit-body {
+    padding: 1.5rem 1rem 2rem 1.2rem;
+  }
+}

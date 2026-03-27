@@ -1,7 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+
+import HelpSupportOverlay from "../components/HelpSupportOverlay";
+import TermsOverlay from "../components/TermsOverlay";
+import PrivacyOverlay from "../components/PrivacyOverlay";
+
+// importing files
 import { useGame } from "../context/useGame";
 import SharedHeader from "../components/SharedHeader";
+import "../styles/profile.css";
+import "../styles/home.css";
+import "../styles/SharedHeader.css";
+
+// importing images
 import starsImg from "../assets/common/stars.png";
 import coinsImg from "../assets/common/coins.png";
 import cardsImg from "../assets/profile/cards.png";
@@ -12,10 +23,15 @@ import richestImg from "../assets/profile/richest.png";
 import legendImg from "../assets/profile/legend.png";
 import veteranImg from "../assets/profile/veteran.png";
 import vipImg from "../assets/profile/vip.png";
+import notificationImg from "../assets/profile/notification.png";
+import soundImg from "../assets/profile/sound.png";
+import helpImg from "../assets/profile/help.png";
+import languageImg from "../assets/profile/language.png";
+import termsImg from "../assets/profile/terms.png";
+import privacyImg from "../assets/profile/security.png";
 
-import "../styles/profile.css";
-import "../styles/home.css";
-import "../styles/SharedHeader.css";
+// fontawsome icon
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Achievement categories with thresholds
 const COIN_ACHIEVEMENTS = [
@@ -64,25 +80,25 @@ const SPECIAL_ACHIEVEMENTS = [
     id: "richest", 
     name: "Richest", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 2000 && stars >= 108 && cardCount >= 3 && nftCount >= 3,
-    icon: {richestImg}
+    icon: richestImg
   },
   { 
     id: "legend", 
     name: "Legend", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 10000 && stars >= 300 && cardCount >= 7 && nftCount >= 7,
-    icon: {legendImg}
+    icon: legendImg
   },
   { 
     id: "veteran", 
     name: "Veteran", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 50000 && stars >= 700 && cardCount >= 11 && nftCount >= 11,
-    icon: {veteranImg}
+    icon: veteranImg
   },
   { 
     id: "vip", 
     name: "VIP", 
     condition: (coins, stars, cardCount, nftCount) => coins >= 100000 && stars >= 1500 && cardCount >= 21 && nftCount >= 17,
-    icon: {vipImg}
+    icon: vipImg
   },
 ];
 
@@ -127,6 +143,13 @@ const Profile = () => {
   const [sound, setSound] = useState(true);
   const [showLevelInfo, setShowLevelInfo] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const [isEditing, setIsEditing] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [editName, setEditName] = useState('Player One');
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const photoRef = useRef(null);
   const iconRef = useRef(null);
 
   // Calculate stats
@@ -221,8 +244,92 @@ const Profile = () => {
       {/* Shared Transparent Header */}
       <SharedHeader />
 
+      {/* Edit Overlay */}
+      {isEditing && createPortal(
+        <div className="edit-profile-overlay" onClick={() => setIsEditing(false)}>
+          <div className="edit-profile-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-profile-header">
+              <h3>Edit Profile</h3>
+              <button className="edit-close" onClick={() => setIsEditing(false)}>×</button>
+            </div>
+            <div className="edit-avatar-preview text-center mx-auto">
+              <div className="edit-avatar-display mb-4">
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Preview" className="edit-avatar-img" />
+                ) : (
+                  <div className="edit-avatar-placeholder">🎭</div>
+                )}
+              </div>
+              <div className="flex flex-col gap-2 max-w-md mx-auto">
+                <input
+                  ref={photoRef}
+                  type="file"
+                  accept="image/*"
+                  className="edit-file-input"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const url = URL.createObjectURL(file);
+                      setPhotoPreview(url);
+                    }
+                  }}
+                />
+                <input
+                  type="url"
+                  className="edit-input"
+                  placeholder="Avatar URL (e.g. https://example.com/avatar.jpg)"
+                  onChange={(e) => {
+                    const url = e.target.value;
+                    if (url) {
+                      setPhotoPreview(url);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            <div className="edit-form">
+              <label className="edit-label">Name</label>
+              <input
+                type="text"
+                className="edit-input"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value.slice(0, 20))}
+                maxLength="20"
+                placeholder="Enter your display name (max 20 chars)"
+              />
+              <label className="edit-label">Email</label>
+              <input
+                type="email"
+                className="edit-input"
+                value="player@example.com"
+                readOnly
+                maxLength="35"
+                placeholder="player@example.com (max 35 chars)"
+              />
+            </div>
+            <div className="edit-actions">
+              <button className="edit-cancel flex-1" onClick={() => setIsEditing(false)}>
+                Cancel
+              </button>
+              <button className="edit-save edit-cancel" onClick={() => {
+                // Save logic here (localStorage, Firebase, etc.)
+                console.log('Saved:', { editName, photoPreview });
+                setIsEditing(false);
+              }}>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      <HelpSupportOverlay isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <TermsOverlay isOpen={showTerms} onClose={() => setShowTerms(false)} />
+      <PrivacyOverlay isOpen={showPrivacy} onClose={() => setShowPrivacy(false)} />
+
       {/* Page Content */}
-      <div className="profile-content">
+      <div className="profile-content"> 
         {/* Page Header */}
         <div className="profile-header">
           <h1 className="profile-title">My Profile</h1>
@@ -233,11 +340,20 @@ const Profile = () => {
         <div className="profile-main">
           {/* Avatar Card */}
           <div className="profile-avatar-card">
-            <div className="profile-avatar-section">
-              <div className="profile-avatar">🎭</div>
+            <div className="profile-avatar-section relative">
+              <button 
+                className="edit-avatar-btn absolute top-[-5px] right-[-10px] w-5 h-5 bg-gradient-to-br from-emerald-400 to-emerald-600 border-none border-white/30 rounded-full flex items-center justify-center shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 z-20 text-white font-bold text-xs drop-shadow-lg cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
+                <i className="fa-solid fa-pencil" style={{ color: '#10b981', fontSize: '0.875rem' }}></i>
+              </button>
+              <div className="profile-avatar">{photoPreview ? (
+                <img src={photoPreview} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+              ) : "🎭"}</div>
               <div className="profile-level-badge">Level {level}</div>
             </div>
-            <h2 className="profile-name">Player One</h2>
+
+            <h2 className="profile-name">{editName}</h2>
             <div className="profile-title-wrapper">
               <p className="profile-title-text">{getTitle()}</p>
               {/* Level Info Icon next to title */}
@@ -377,7 +493,7 @@ const Profile = () => {
 
         {/* Achievements Section */}
         <div className="profile-section">
-          <h3 className="profile-section-title">🏆 Achievements</h3>
+          <h3 className="profile-section-title">Achievements</h3>
           
           {/* Achievement Categories Grid */}
           <div className="achievement-categories">
@@ -481,13 +597,16 @@ const Profile = () => {
           <div className="special-achievements">
             <h4 className="special-achievements-title">Special Achievements</h4>
             <div className="special-achievements-grid">
-              {SPECIAL_ACHIEVEMENTS.map(achievement => (
+{SPECIAL_ACHIEVEMENTS.map(achievement => (
                 <div 
                   key={achievement.id} 
-                  className={`special-achievement ${isAchievementUnlocked(achievement, coins, stars, cardCount, nftCount) ? 'unlocked' : 'locked'}`}
+                  className={`special-achievement aspect-square relative ${isAchievementUnlocked(achievement, coins, stars, cardCount, nftCount) ? 'unlocked' : 'locked'}`}
                 >
-                  <span className="special-achievement-icon">{achievement.icon}</span>
-                  <span className="special-achievement-name">{achievement.name}</span>
+                  <img 
+                    src={achievement.icon} 
+                    alt={achievement.name}
+                    className="special-achievement-icon w-full h-full object-cover rounded-lg"
+                  />
                 </div>
               ))}
             </div>
@@ -496,11 +615,11 @@ const Profile = () => {
 
         {/* Settings Section */}
         <div className="profile-section">
-          <h3 className="profile-section-title">⚙️ Settings</h3>
+          <h3 className="profile-section-title">Settings</h3>
           <div className="profile-settings-list">
             <div className="profile-setting-item">
               <div className="profile-setting-info">
-                <span className="profile-setting-icon">🔔</span>
+                <img src={notificationImg} alt="Notifications" className="profile-setting-icon" />
                 <span className="profile-setting-text">Notifications</span>
               </div>
               <div 
@@ -510,7 +629,7 @@ const Profile = () => {
             </div>
             <div className="profile-setting-item">
               <div className="profile-setting-info">
-                <span className="profile-setting-icon">🔊</span>
+                <img src={soundImg} alt="Sound" className="profile-setting-icon" />
                 <span className="profile-setting-text">Sound Effects</span>
               </div>
               <div 
@@ -520,31 +639,33 @@ const Profile = () => {
             </div>
             <div className="profile-setting-item">
               <div className="profile-setting-info">
-                <span className="profile-setting-icon">🌐</span>
+                <img src={languageImg} alt="Language" className="profile-setting-icon" />
                 <span className="profile-setting-text">Language</span>
               </div>
-              <span className="profile-setting-arrow">English →</span>
+              <span className="profile-setting-arrow cursor-pointer" onClick={() => setShowLanguage(true)}>English →</span>
             </div>
+
             <div className="profile-setting-item">
               <div className="profile-setting-info">
-                <span className="profile-setting-icon">❓</span>
+                <img src={helpImg} alt="Help" className="profile-setting-icon" />
                 <span className="profile-setting-text">Help & Support</span>
               </div>
-              <span className="profile-setting-arrow">→</span>
+              <span className="profile-setting-arrow cursor-pointer" onClick={() => setShowHelp(true)}>→</span>
             </div>
+
             <div className="profile-setting-item">
               <div className="profile-setting-info">
-                <span className="profile-setting-icon">📋</span>
+                <img src={termsImg} alt="Terms" className="profile-setting-icon" />
                 <span className="profile-setting-text">Terms of Service</span>
               </div>
-              <span className="profile-setting-arrow">→</span>
+              <span className="profile-setting-arrow cursor-pointer" onClick={() => setShowTerms(true)}>→</span>
             </div>
             <div className="profile-setting-item">
               <div className="profile-setting-info">
-                <span className="profile-setting-icon">🔒</span>
+                <img src={privacyImg} alt="Privacy" className="profile-setting-icon" />
                 <span className="profile-setting-text">Privacy Policy</span>
               </div>
-              <span className="profile-setting-arrow">→</span>
+              <span className="profile-setting-arrow cursor-pointer" onClick={() => setShowPrivacy(true)}>→</span>
             </div>
           </div>
         </div>
