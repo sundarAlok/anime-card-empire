@@ -105,11 +105,6 @@ anime-card-empire/
 4. Push (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details (create if needed).
-
-## 📄 License
-
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file (add if needed).
 
 ## 🙌 Acknowledgments
 
@@ -117,6 +112,11 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file (ad
 - [TailwindCSS](https://tailwindcss.com) - Utility-first CSS
 - [Firebase](https://firebase.google.com) - Backend services
 - Anime fan community for inspiration! 🔥
+
+
+## 📄 License
+
+This project is licensed under the MIT License.
 
 ---
 
