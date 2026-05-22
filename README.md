@@ -12,7 +12,7 @@
 
 <div align="center">
   <!-- Demo link placeholder - add your deployed URL here -->
-  <a href="https://your-app.vercel.app" target="_blank">
+  <a href="https://anime-card-empire.vercel.app/" target="_blank">
     <img src="https://img.shields.io/badge/Play%20Demo-000?style=for-the-badge&logo=vercel&logoColor=white" alt="Demo">
   </a>
 </div>

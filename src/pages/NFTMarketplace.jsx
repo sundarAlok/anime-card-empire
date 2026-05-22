@@ -568,7 +568,10 @@ const NFTMarketplace = () => {
       </div>
 
       {/* NFT Grid */}
-      <div className="nft-grid">
+      <div
+        className="nft-grid"
+        onContextMenu={(e) => e.preventDefault()}
+      >
         {filteredNFTs.map(nft => {
           const owned = isOwned(nft.id);
           const canAfford = stars >= nft.price;
@@ -581,7 +584,32 @@ const NFTMarketplace = () => {
               {/* Image Section */}
               <div className="nft-image-section">
                 <div className="nft-image-bg" />
-                <img src={nft.image} alt={nft.name} className="nft-image" />
+
+{owned ? (
+                  <img
+                    src={nft.image}
+                    alt={nft.name}
+                    className="nft-image nft-image-unlocked"
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onMouseDown={(e) => e.preventDefault()}
+                  />
+                ) : (
+                  <div className="nft-locked-placeholder" aria-hidden="true">
+                    <img
+                      src={nft.image}
+                      alt=""
+                      className="nft-image nft-image-locked"
+                      draggable={false}
+                      onDragStart={(e) => e.preventDefault()}
+                      onContextMenu={(e) => e.preventDefault()}
+                      onMouseDown={(e) => e.preventDefault()}
+                    />
+                    <div className="nft-locked-shimmer" />
+                    <div className="nft-locked-text">Locked</div>
+                  </div>
+                )}
 
                 {/* Badges */}
                 <div className="nft-badges">
@@ -622,19 +650,27 @@ const NFTMarketplace = () => {
 
                 {/* Purchase Button */}
                 <div className="purchase-wrapper">
-                  <button
-                    className={`nft-purchase ${owned ? 'owned' : 'buy'}`}
-                    onClick={() => handlePurchase(nft)}
-                    disabled={owned || !canAfford}
-                  >
-                    {owned ? "You Own This NFT" : (
-                      <>
-                        Purchase for
-                        <img src={starImg} alt="stars" className="star-icon" />
-                        {nft.price.toLocaleString()}
-                      </>
-                    )}
-                  </button>
+                  {owned ? (
+                    <a
+                      className={`nft-purchase owned`}
+                      href={nft.image}
+                      download={`${nft.name}.png`}
+                      onContextMenu={(e) => e.preventDefault()}
+                      draggable={false}
+                    >
+                      Download
+                    </a>
+                  ) : (
+                    <button
+                      className={`nft-purchase buy`}
+                      onClick={() => handlePurchase(nft)}
+                      disabled={!canAfford}
+                    >
+                      Purchase for
+                      <img src={starImg} alt="stars" className="star-icon" />
+                      {nft.price.toLocaleString()}
+                    </button>
+                  )}
 
                   {!owned && !canAfford && (
                     <div className="hover-message">
