@@ -63,7 +63,7 @@ export const GameProvider = ({ children }) => {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  const [stars, setStars] = useState(99999);
+  const [stars, setStars] = useState(0);
 
   const [highestCoins, setHighestCoins] = useState(() => {
     const saved = localStorage.getItem("highestCoins");
