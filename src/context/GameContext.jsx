@@ -4,6 +4,7 @@ import { STAR_RATES } from "../constants/starRates";
 import { CARD_REWARDS_MAP } from "../constants/cardRewards";
 import { preciseAdd } from "../utils/math";
 import { calculateTapRefill } from "../utils/cooldown";
+import { useAuth } from "./useAuth";
 
 export const GameContext = createContext(null);
 
@@ -54,6 +55,7 @@ const LEVEL_THRESHOLDS = [
 ];
 
 export const GameProvider = ({ children }) => {
+  const { isLoggedIn, userData, saveGameData } = useAuth();
 
   /* -----------------------------
      ECONOMY
@@ -163,6 +165,24 @@ export const GameProvider = ({ children }) => {
     }
   });
 
+  // When a user logs in, load their saved game data into the GameContext state
+  useEffect(() => {
+    if (!isLoggedIn || !userData) return;
+
+    try {
+      setCoins(Number(userData.coins) || 0);
+      setStars(Number(userData.stars) || 0);
+      setHighestCoins(Number(userData.highestCoins) || 0);
+      setTapLimit(userData.tapLimit ?? GAME_CONFIG.INITIAL_TAP_LIMIT);
+      setStreakDays(userData.streakDays ?? 0);
+      setLastClaimDate(userData.lastClaimDate ?? null);
+      setCards(userData.cards || {});
+      setNfts(userData.nfts || {});
+    } catch (e) {
+      console.error("Error applying userData to GameContext:", e);
+    }
+  }, [isLoggedIn, userData]);
+
   /* -----------------------------
      LEVEL CALCULATION
   --------------------------------*/
@@ -221,6 +241,30 @@ export const GameProvider = ({ children }) => {
   /* -----------------------------
      TAP REFILL ENGINE
   --------------------------------*/
+  
+  // Persist game data to Firestore for logged-in users
+  useEffect(() => {
+    if (!isLoggedIn || typeof saveGameData !== "function") return;
+
+    // Debounce saves to avoid excessive Firestore writes.
+    const timeout = setTimeout(() => {
+      const dataToSave = {
+        coins,
+        stars,
+        highestCoins,
+        tapLimit,
+        level,
+        streakDays,
+        lastClaimDate,
+        cards,
+        nfts
+      };
+
+      saveGameData(dataToSave);
+    }, 5000); // wait 5s after the last change
+
+    return () => clearTimeout(timeout);
+  }, [isLoggedIn, coins, stars, highestCoins, tapLimit, level, streakDays, lastClaimDate, cards, nfts, saveGameData]);
 
   useEffect(() => {
     const interval = setInterval(() => {

@@ -33,6 +33,7 @@ import starImg from "../assets/common/stars.png";
 import zenitsuImg from "../assets/cards/luffy.jpg";
 import namiImg from "../assets/cards/luffy.jpg";
 import tienImg from "../assets/cards/luffy.jpg";
+import robinImg from "../assets/cards/luffy.jpg";
 import sakuraImg from "../assets/cards/luffy.jpg";
 import leviImg from "../assets/cards/luffy.jpg";
 import lImg from "../assets/cards/luffy.jpg";
@@ -175,21 +176,21 @@ const NFT_DATA = [
   },
 
   // Enhanced
-  {
-    id: "nft_zoro_enhanced",
-    name: "Roronoa Zoro",
+ {
+    id: "nft_sanji_enhanced",
+    name: "Sanji",
     anime: "One Piece",
-    info: "Zoro is a master swordsman whose ambition to become the world’s greatest is matched only by his unbreakable determination and spirit.",
-    image: zoroImg,
+    info: "Sanji is a master chef and fighter, delivering lethal kicks with unmatched speed while protecting those he loves with unwavering loyalty.",
+    image: sanjiImg,
     rarity: "enhanced",
     price: 353,
     totalSupply: 143,
     quotes: [
-      "Promise me. Someday, one of us will be the world's greatest swordsman. We'll compete to get there.",
-      "A crew with no respect and a captain that doesn't demand it is destined to fall apart quickly.",
-      "Scars on the back are a swordsman's shame.",
-      "Only I can call my dream stupid!",
-      "Nothing happened. I’m still the best swordsman!"
+      "I only kick for love… and victory!",
+      "True strength is protecting those you care about.",
+      "A gentleman fights with honor.",
+      "Passion fuels my power.",
+      "No one stands between me and my dreams."
     ]
   },
   {
@@ -233,7 +234,7 @@ const NFT_DATA = [
     info: "Sasuke, the avenger, pursues power relentlessly, mastering his Sharingan and Rinnegan to challenge fate itself and protect what he values.",
     image: sasukeImg,
     rarity: "enhanced",
-    price: 328,
+    price: 368,
     totalSupply: 121,
     quotes: [
       "I have my own path to follow, no matter the cost.",
@@ -331,20 +332,20 @@ const NFT_DATA = [
     ]
   },
   {
-    id: "nft_sanji_elite",
-    name: "Sanji",
+    id: "nft_zoro_elite",
+    name: "Roronoa Zoro",
     anime: "One Piece",
-    info: "Sanji is a master chef and fighter, delivering lethal kicks with unmatched speed while protecting those he loves with unwavering loyalty.",
-    image: sanjiImg,
+    info: "Zoro is a master swordsman whose ambition to become the world’s greatest is matched only by his unbreakable determination and spirit.",
+    image: zoroImg,
     rarity: "elite",
     price: 552,
     totalSupply: 78,
     quotes: [
-      "I only kick for love… and victory!",
-      "True strength is protecting those you care about.",
-      "A gentleman fights with honor.",
-      "Passion fuels my power.",
-      "No one stands between me and my dreams."
+      "Promise me. Someday, one of us will be the world's greatest swordsman. We'll compete to get there.",
+      "A crew with no respect and a captain that doesn't demand it is destined to fall apart quickly.",
+      "Scars on the back are a swordsman's shame.",
+      "Only I can call my dream stupid!",
+      "Nothing happened. I’m still the best swordsman!"
     ]
   },
 

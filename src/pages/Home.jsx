@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useGame } from "../context/useGame";
+import { useAuth } from "../context/useAuth";
 import tapImg from "../assets/tap.png";
 import SharedHeader from "../components/SharedHeader";
-import "../styles/home.css";
 import StreakOverlay from "../components/StreakOverlay";
+import AuthPrompt from "../components/AuthPrompt";
+import AuthOverlay from "../components/AuthOverlay";
+import "../styles/home.css";
 
 
 /* Coins per tap table (Level Guide) */
@@ -30,6 +33,7 @@ const TAP_LEVEL_DATA = [
 const Home = () => {
 
   const { coins, tapLimit, tap, coinsPerTap, level, streakDays } = useGame();
+  const { isLoggedIn } = useAuth();
 
 
   const maxTaps = 100;
@@ -38,6 +42,7 @@ const Home = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [showStreak, setShowStreak] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
 
   const iconRef = useRef(null);
@@ -159,11 +164,17 @@ const Home = () => {
             </div>
           </div>
           <div className="section-right">
-            {/* Streak Badge */}
-            <div className="streak-badge section-1" onClick={() => setShowStreak(true)}>
-              <span className="streak-emoji">🔥</span>
-              <span className="streak-days">{streakDays}</span>
-            </div>
+            {/* Streak Badge or Auth Prompt Badge */}
+            {isLoggedIn ? (
+              <div className="streak-badge section-1" onClick={() => setShowStreak(true)}>
+                <span className="streak-emoji">🔥</span>
+                <span className="streak-days">{streakDays}</span>
+              </div>
+            ) : (
+              <div className="auth-badge section-1" onClick={() => setShowAuth(true)}>
+                <span className="auth-emoji">🔐</span>
+              </div>
+            )}
             <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-2"></div>
             <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-3"></div>
             <div className="w-20 h-20 flex items-center justify-center border border-purple-500/30 invisible section-4"></div>
@@ -171,7 +182,9 @@ const Home = () => {
         
         </div>
 
-
+        {!isLoggedIn && (
+          <AuthPrompt onAuthClick={() => setShowAuth(true)} />
+        )}
 
       </main>
 
@@ -261,6 +274,7 @@ className="game-info-tooltip"
       )}
 
       <StreakOverlay isOpen={showStreak} onClose={() => setShowStreak(false)} />
+      <AuthOverlay isOpen={showAuth} onClose={() => setShowAuth(false)} />
 
 
 

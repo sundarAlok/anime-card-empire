@@ -1,0 +1,106 @@
+.auth-prompt-container {
+  width: 100%;
+  margin: 20px 0;
+}
+
+.auth-prompt-box {
+  background: linear-gradient(135deg, #87CEEB 0%, #00BFFF 50%, #87CEEB 100%);
+  border-radius: 20px;
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 191, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-prompt-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+}
+
+.auth-prompt-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 191, 255, 0.35);
+}
+
+.auth-prompt-box:active {
+  transform: translateY(-2px);
+}
+
+.auth-prompt-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.auth-prompt-title {
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auth-prompt-description {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.auth-prompt-cta {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.auth-prompt-box:hover .auth-prompt-cta {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Compact badge used on Home when user is not logged in */
+.auth-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 auto 10px auto;
+  box-shadow: 0 8px 20px rgba(0, 191, 255, 0.25);
+  background: linear-gradient(135deg, #87CEEB 0%, #00BFFF 50%, #87CEEB 100%);
+  border: 2px solid rgba(255,255,255,0.35);
+}
+
+.auth-badge .auth-emoji {
+  font-size: 28px;
+}
