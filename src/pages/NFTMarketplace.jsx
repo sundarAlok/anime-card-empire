@@ -106,6 +106,23 @@ const NFT_DATA = [
     ]
   },
   {
+  id: "nft_robin_common",
+  name: "Nico Robin",
+  anime: "One Piece",
+  info: "Nico Robin is a brilliant archaeologist and the sole survivor of Ohara, using the powers of the Hana Hana no Mi and her vast knowledge to uncover the world's hidden history.",
+  image: robinImg,
+  rarity: "common",
+  price: 256,
+  totalSupply: 202,
+  quotes: [
+    "I want to live! Take me out to sea with you!",
+    "Fools who do not respect the past are doomed to repeat it.",
+    "History may repeat itself, but humans cannot return to the past.",
+    "When you have a hard time, just laugh.",
+    "There is no such thing as being born into the world to be alone."
+  ]
+},
+  {
     id: "nft_sakura_common",
     name: "Sakura Haruno",
     anime: "Naruto",

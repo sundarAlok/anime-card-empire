@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useRef } from "react";
 import { GAME_CONFIG } from "../constants/gameConfig";
 import { STAR_RATES } from "../constants/starRates";
+import { CARD_REWARDS_MAP } from "../constants/cardRewards";
 import { preciseAdd } from "../utils/math";
 import { calculateTapRefill } from "../utils/cooldown";
 
@@ -134,11 +135,33 @@ export const GameProvider = ({ children }) => {
      CARDS + NFTS
   --------------------------------*/
 
-  const [cards, setCards] = useState({
-    starter: { level: 1 }
+  // Cards “ownership” is defined by upgrade level.
+  // Persist to localStorage so state shape stays stable and the UI never blanks.
+  const [cards, setCards] = useState(() => {
+    try {
+      const saved = localStorage.getItem("cards");
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error("Error parsing cards from localStorage:", e);
+      return {};
+    }
   });
 
-  const [nfts, setNfts] = useState({});
+  const cardsRef = useRef(cards);
+
+  useEffect(() => {
+    cardsRef.current = cards;
+  }, [cards]);
+
+  const [nfts, setNfts] = useState(() => {
+    try {
+      const saved = localStorage.getItem("nfts");
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error("Error parsing nfts from localStorage:", e);
+      return {};
+    }
+  });
 
   /* -----------------------------
      LEVEL CALCULATION
@@ -186,6 +209,14 @@ export const GameProvider = ({ children }) => {
     localStorage.setItem("streakDays", streakDays.toString());
   }, [streakDays]);
 
+  useEffect(() => {
+    localStorage.setItem("cards", JSON.stringify(cards));
+  }, [cards]);
+
+  useEffect(() => {
+    localStorage.setItem("nfts", JSON.stringify(nfts));
+  }, [nfts]);
+
 
   /* -----------------------------
      TAP REFILL ENGINE
@@ -217,32 +248,64 @@ export const GameProvider = ({ children }) => {
     const interval = setInterval(() => {
       let totalPerHour = 0;
 
-      Object.values(cards).forEach(card => {
+      try {
+        Object.values(cardsRef.current).forEach(card => {
+          const level = Number(card?.level) || 0;
+          const rate = STAR_RATES[level] ?? 0;
 
-        const level = Number(card.level) || 0;
-        const rate = STAR_RATES[level] ?? 0;
+          if (level >= 4) {
+            totalPerHour += rate;
+          }
+        });
 
-        if (level >= 4) {
-          totalPerHour += rate;
+        if (totalPerHour > 0) {
+          const perSecond = totalPerHour / 3600;
+          setStars(prev =>
+            preciseAdd(Number(prev) || 0, perSecond)
+          );
         }
-
-      });
-
-      if (totalPerHour > 0) {
-
-        const perSecond = totalPerHour / 3600;
-
-        setStars(prev =>
-          preciseAdd(Number(prev) || 0, perSecond)
-        );
-
+      } catch (e) {
+        console.error("Error in star engine:", e);
       }
-
     }, 1000);
 
     return () => clearInterval(interval);
+  }, []);
 
-  }, [cards]);
+  /* -----------------------------
+     COIN ENGINE
+  --------------------------------*/
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      let totalPerHour = 0;
+
+      try {
+        Object.entries(cardsRef.current).forEach(([cardId, cardData]) => {
+          const level = Number(cardData?.level) || 0;
+          const cardRewards = CARD_REWARDS_MAP[cardId];
+
+          if (cardRewards && level >= 1 && level <= 3) {
+            // Coin rewards are for levels 1-3
+            const rewardIndex = level - 1;
+            const coinRate = cardRewards.coin[rewardIndex] ?? 0;
+            totalPerHour += coinRate;
+          }
+        });
+
+        if (totalPerHour > 0) {
+          const perSecond = totalPerHour / 3600;
+          setCoins(prev =>
+            preciseAdd(Number(prev) || 0, perSecond)
+          );
+        }
+      } catch (e) {
+        console.error("Error in coin engine:", e);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   /* -----------------------------
      TAP FUNCTION

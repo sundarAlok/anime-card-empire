@@ -152,8 +152,8 @@ const Profile = () => {
   const photoRef = useRef(null);
   const iconRef = useRef(null);
 
-  // Calculate stats
-  const cardCount = Object.keys(cards).length;
+  // “Owned cards” = cards where upgrade level >= 10
+  const cardCount = Object.values(cards || {}).filter(c => (c?.level ?? 0) >= 10).length;
   const nftCount = Object.values(nfts).filter(Boolean).length;
   const memberSince = "January 2025";
 
