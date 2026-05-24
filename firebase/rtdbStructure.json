@@ -1,0 +1,119 @@
+{
+  "firestoreStructure": {
+    "users": {
+      "description": "Collection storing all user data",
+      "schema": {
+        "uid": {
+          "type": "string",
+          "description": "User's unique Firebase Auth ID"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User's profile picture URL"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "description": "Account creation timestamp"
+        },
+        "lastUpdated": {
+          "type": "timestamp",
+          "description": "Last update timestamp"
+        },
+        "coins": {
+          "type": "number",
+          "default": 0,
+          "description": "Current coin balance"
+        },
+        "stars": {
+          "type": "number",
+          "default": 0,
+          "description": "Current star balance"
+        },
+        "highestCoins": {
+          "type": "number",
+          "default": 0,
+          "description": "Highest coin amount ever reached"
+        },
+        "tapLimit": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of taps before cooldown"
+        },
+        "level": {
+          "type": "number",
+          "default": 1,
+          "description": "Current player level"
+        },
+        "streakDays": {
+          "type": "number",
+          "default": 0,
+          "description": "Current daily streak count"
+        },
+        "lastClaimDate": {
+          "type": "string|null",
+          "description": "Last date streak reward was claimed (ISO date string)"
+        },
+        "cards": {
+          "type": "object",
+          "description": "User's card collection, keyed by card ID with level/upgrade data",
+          "example": {
+            "card_001": {
+              "level": 1,
+              "lastUpdated": "2025-01-01T00:00:00Z"
+            }
+          }
+        },
+        "nfts": {
+          "type": "object",
+          "description": "User's NFT collection, keyed by NFT ID",
+          "example": {
+            "nft_001": {
+              "name": "Legendary Card #1",
+              "acquiredAt": "2025-01-01T00:00:00Z",
+              "metadata": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "rtdbLegacy": {
+    "description": "Legacy RTDB structure (kept for reference, use Firestore instead)",
+    "users": {
+      "$uid": {
+        "profile": {
+          "name": "Player",
+          "email": "",
+          "image": "",
+          "memberSince": "January 2025",
+          "updatedAt": null
+        },
+        "game": {
+          "coins": 0,
+          "stars": 0,
+          "highestCoins": 0,
+          "tapLimit": 100,
+          "level": 1,
+          "streakDays": 0,
+          "lastClaimDate": null,
+          "cards": {},
+          "nfts": {}
+        },
+        "meta": {
+          "createdAt": null,
+          "lastUpdated": null
+        }
+      }
+    }
+  }
+}
+
+
