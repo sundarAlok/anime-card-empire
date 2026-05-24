@@ -31,7 +31,7 @@ lerna-debug.log*
 # Firebase - ALL SENSITIVE
 # ===============================
 
-.firebase/
+
 .firebase/*
 firebase-debug.log
 firestore-debug.log
@@ -39,9 +39,6 @@ ui-debug.log
 *.json~  # Firebase temp backups
 firebase.json~  # Firebase config backup
 firestore.rules~  # Rules backup
-firebaseConfig.js~  # Config backup
-src/firebase/firebaseConfig.js
-firebase/
 
 # ===============================
 # Local Storage / Browser Data
