@@ -10,9 +10,11 @@ import {
   getDocs,
   deleteDoc,
   writeBatch,
+  runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
+  import { getPlatformId, getScopedUid } from "../utils/platform";
 // ============================================
 // USER PROFILE OPERATIONS
 // ============================================
@@ -24,7 +26,8 @@ import { db } from "../firebase/firebaseConfig";
  */
 export const loadUserDataFromFirestore = async (uid) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    const userDoc = await getDoc(doc(db, "users", scopedUid));
     return userDoc.exists() ? userDoc.data() : null;
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -60,10 +63,14 @@ export const initializeUserDocument = async (uid, profileDefaults = {}) => {
       nfts: {},
     };
 
-    await setDoc(doc(db, "users", uid), initialData);
+    const scopedUid = getScopedUid(uid);
+    console.log(`Initializing Firestore user document for scopedUid=${scopedUid}`);
+    await setDoc(doc(db, "users", scopedUid), { ...initialData, platform: getPlatformId() });
+    console.log(`Successfully created/initialized user document for scopedUid=${scopedUid}`);
     return initialData;
   } catch (error) {
-    console.error("Error initializing user document:", error);
+    console.error("Error initializing user document for uid=", uid, error);
+    // Re-throw so callers can handle the failure (AuthContext will catch/log)
     throw error;
   }
 };
@@ -76,9 +83,11 @@ export const initializeUserDocument = async (uid, profileDefaults = {}) => {
  */
 export const updateUserProfile = async (uid, profileData) => {
   try {
-    await updateDoc(doc(db, "users", uid), {
+    const scopedUid = getScopedUid(uid);
+    await updateDoc(doc(db, "users", scopedUid), {
       ...profileData,
       lastUpdated: serverTimestamp(),
+      platform: getPlatformId(),
     });
   } catch (error) {
     console.error("Error updating user profile:", error);
@@ -96,17 +105,48 @@ export const updateUserProfile = async (uid, profileData) => {
  * @param {Object} gameData - Game state to save
  * @returns {Promise<void>}
  */
-export const saveGameState = async (uid, gameData) => {
+export const saveGameState = async (uid, gameData, localUpdateTimeMs = null) => {
   try {
-    await updateDoc(doc(db, "users", uid), {
-      coins: gameData.coins ?? 0,
-      stars: gameData.stars ?? 0,
-      highestCoins: gameData.highestCoins ?? 0,
-      level: gameData.level ?? 1,
-      tapLimit: gameData.tapLimit ?? 100,
-      streakDays: gameData.streakDays ?? 0,
-      lastClaimDate: gameData.lastClaimDate ?? null,
-      lastUpdated: serverTimestamp(),
+    const scopedUid = getScopedUid(uid);
+    const userRef = doc(db, "users", scopedUid);
+
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(userRef);
+
+      if (!snap.exists()) {
+        tx.set(userRef, {
+          uid,
+          scopedUid,
+          coins: gameData.coins ?? 0,
+          stars: gameData.stars ?? 0,
+          highestCoins: gameData.highestCoins ?? 0,
+          level: gameData.level ?? 1,
+          tapLimit: gameData.tapLimit ?? 100,
+          streakDays: gameData.streakDays ?? 0,
+          lastClaimDate: gameData.lastClaimDate ?? null,
+          lastUpdated: serverTimestamp(),
+        });
+        return;
+      }
+
+      const serverData = snap.data() || {};
+      const serverLast = serverData.lastUpdated && serverData.lastUpdated.toMillis ? serverData.lastUpdated.toMillis() : null;
+
+      if (localUpdateTimeMs && serverLast && serverLast > localUpdateTimeMs) {
+        // Another client has newer data — skip this write to avoid overwriting newer state.
+        return;
+      }
+
+      tx.update(userRef, {
+        coins: gameData.coins ?? 0,
+        stars: gameData.stars ?? 0,
+        highestCoins: gameData.highestCoins ?? 0,
+        level: gameData.level ?? 1,
+        tapLimit: gameData.tapLimit ?? 100,
+        streakDays: gameData.streakDays ?? 0,
+        lastClaimDate: gameData.lastClaimDate ?? null,
+        lastUpdated: serverTimestamp(),
+      });
     });
   } catch (error) {
     console.error("Error saving game state:", error);
@@ -121,7 +161,8 @@ export const saveGameState = async (uid, gameData) => {
  */
 export const loadGameState = async (uid) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    const userDoc = await getDoc(doc(db, "users", scopedUid));
     if (!userDoc.exists()) return null;
 
     const data = userDoc.data();
@@ -149,7 +190,8 @@ export const loadGameState = async (uid) => {
  */
 export const updateGameCounter = async (uid, field, value) => {
   try {
-    await updateDoc(doc(db, "users", uid), {
+    const scopedUid = getScopedUid(uid);
+    await updateDoc(doc(db, "users", scopedUid), {
       [field]: value,
       lastUpdated: serverTimestamp(),
     });
@@ -170,7 +212,8 @@ export const updateGameCounter = async (uid, field, value) => {
  */
 export const getUserCards = async (uid) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    const userDoc = await getDoc(doc(db, "users", scopedUid));
     return userDoc.exists() ? (userDoc.data().cards || {}) : {};
   } catch (error) {
     console.error("Error loading user cards:", error);
@@ -186,7 +229,8 @@ export const getUserCards = async (uid) => {
  */
 export const saveUserCards = async (uid, cards) => {
   try {
-    await updateDoc(doc(db, "users", uid), {
+    const scopedUid = getScopedUid(uid);
+    await updateDoc(doc(db, "users", scopedUid), {
       cards: cards || {},
       lastUpdated: serverTimestamp(),
     });
@@ -205,7 +249,8 @@ export const saveUserCards = async (uid, cards) => {
  */
 export const updateCardLevel = async (uid, cardId, level) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    const userDoc = await getDoc(doc(db, "users", scopedUid));
     if (!userDoc.exists()) throw new Error("User not found");
 
     const cards = userDoc.data().cards || {};
@@ -218,7 +263,7 @@ export const updateCardLevel = async (uid, cardId, level) => {
       },
     };
 
-    await updateDoc(doc(db, "users", uid), {
+    await updateDoc(doc(db, "users", scopedUid), {
       cards: updatedCards,
       lastUpdated: serverTimestamp(),
     });
@@ -239,7 +284,8 @@ export const updateCardLevel = async (uid, cardId, level) => {
  */
 export const getUserNFTs = async (uid) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    const userDoc = await getDoc(doc(db, "users", scopedUid));
     return userDoc.exists() ? (userDoc.data().nfts || {}) : {};
   } catch (error) {
     console.error("Error loading user NFTs:", error);
@@ -255,7 +301,8 @@ export const getUserNFTs = async (uid) => {
  */
 export const saveUserNFTs = async (uid, nfts) => {
   try {
-    await updateDoc(doc(db, "users", uid), {
+    const scopedUid = getScopedUid(uid);
+    await updateDoc(doc(db, "users", scopedUid), {
       nfts: nfts || {},
       lastUpdated: serverTimestamp(),
     });
@@ -274,7 +321,8 @@ export const saveUserNFTs = async (uid, nfts) => {
  */
 export const addUserNFT = async (uid, nftId, nftData) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    const userDoc = await getDoc(doc(db, "users", scopedUid));
     if (!userDoc.exists()) throw new Error("User not found");
 
     const nfts = userDoc.data().nfts || {};
@@ -286,7 +334,7 @@ export const addUserNFT = async (uid, nftId, nftData) => {
       },
     };
 
-    await updateDoc(doc(db, "users", uid), {
+    await updateDoc(doc(db, "users", scopedUid), {
       nfts: updatedNFTs,
       lastUpdated: serverTimestamp(),
     });
@@ -311,7 +359,8 @@ export const batchUpdateUsers = async (operations) => {
     const batch = writeBatch(db);
 
     operations.forEach(({ uid, data }) => {
-      batch.update(doc(db, "users", uid), {
+      const scopedUid = getScopedUid(uid);
+      batch.update(doc(db, "users", scopedUid), {
         ...data,
         lastUpdated: serverTimestamp(),
       });
@@ -331,7 +380,8 @@ export const batchUpdateUsers = async (operations) => {
  */
 export const deleteUserDocument = async (uid) => {
   try {
-    await deleteDoc(doc(db, "users", uid));
+    const scopedUid = getScopedUid(uid);
+    await deleteDoc(doc(db, "users", scopedUid));
   } catch (error) {
     console.error("Error deleting user document:", error);
     throw error;

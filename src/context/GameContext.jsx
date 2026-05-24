@@ -90,7 +90,30 @@ export const GameProvider = ({ children }) => {
 
   const getDailyStreakReward = () => {
     const baseReward = 100;
-    const multiplier = Math.pow(1.07, streakDays);
+
+    // Tiered daily growth rates (compounded per day):
+    // days 0-29: 7% daily
+    // days 30-59: 3% daily
+    // days 60-99: 1% daily
+    // days 100-149: 0.5% daily
+    // days 150-364: 0.3% daily
+    // day >=365: 0.1% daily
+    const getRateForDay = (dayIndex) => {
+      if (dayIndex < 30) return 0.07;
+      if (dayIndex < 60) return 0.03;
+      if (dayIndex < 100) return 0.01;
+      if (dayIndex < 150) return 0.005; // 0.5%
+      if (dayIndex < 365) return 0.003; // 0.3%
+      return 0.001; // 0.1%
+    };
+
+    // Compound the per-day rates up to current streakDays
+    let multiplier = 1;
+    for (let d = 0; d < Math.max(0, streakDays); d++) {
+      const rate = getRateForDay(d);
+      multiplier *= (1 + rate);
+    }
+
     return Math.floor(baseReward * multiplier);
   };
 
@@ -256,6 +279,8 @@ export const GameProvider = ({ children }) => {
         nfts,
       };
 
+      // Attach a local timestamp so server-side transaction can avoid overwriting newer data
+      dataToSave._localUpdateTimeMs = Date.now();
       saveGameData(dataToSave);
     }, 5000); // wait 5s after the last change
 

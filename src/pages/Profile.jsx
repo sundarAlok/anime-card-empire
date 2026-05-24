@@ -142,7 +142,7 @@ const LEVEL_DATA = [
 
 const Profile = () => {
   const { stars, coins, highestCoins, cards, nfts } = useGame();
-  const { signOut } = useAuth();
+  const { signOut, user, userData, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
@@ -277,6 +277,15 @@ const Profile = () => {
     };
   }, [showLevelInfo]);
 
+  // Sync local edit fields with userData when it becomes available,
+  // but do NOT overwrite while the user is actively editing.
+  useEffect(() => {
+    if (!isEditing && userData) {
+      setEditName(userData.displayName || 'Player');
+      setPhotoPreview(userData.photoURL || null);
+    }
+  }, [userData, isEditing]);
+
   return (
     <div className="profile-container">
       {/* Background Effects */}
@@ -352,14 +361,19 @@ const Profile = () => {
                 placeholder="player@example.com (max 35 chars)"
               />
             </div>
-            <div className="edit-actions">
+              <div className="edit-actions">
               <button className="edit-cancel flex-1" onClick={() => setIsEditing(false)}>
                 Cancel
               </button>
-              <button className="edit-save edit-cancel" onClick={() => {
-                // Save logic here (localStorage, Firebase, etc.)
-                console.log('Saved:', { editName, photoPreview });
-                setIsEditing(false);
+              <button className="edit-save edit-cancel" onClick={async () => {
+                try {
+                  if (!user) throw new Error('No authenticated user');
+                  await updateProfile(user.uid, { displayName: editName, photoURL: photoPreview });
+                  setIsEditing(false);
+                } catch (err) {
+                  console.error('Failed to save profile changes', err);
+                  alert('Failed to save profile changes. Check console for details.');
+                }
               }}>
                 Save Changes
               </button>
@@ -388,17 +402,22 @@ const Profile = () => {
             <div className="profile-avatar-section relative">
               <button 
                 className="edit-avatar-btn absolute top-[-5px] right-[-10px] w-5 h-5 bg-gradient-to-br from-emerald-400 to-emerald-600 border-none border-white/30 rounded-full flex items-center justify-center shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 z-20 text-white font-bold text-xs drop-shadow-lg cursor-pointer"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  // initialize local edit fields with latest remote values when opening editor
+                  setEditName(userData?.displayName || 'Player');
+                  setPhotoPreview(userData?.photoURL || null);
+                  setIsEditing(true);
+                }}
               >
                 <i className="fa-solid fa-pencil" style={{ color: '#10b981', fontSize: '0.875rem' }}></i>
               </button>
-              <div className="profile-avatar">{photoPreview ? (
-                <img src={photoPreview} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+              <div className="profile-avatar">{userData?.photoURL ? (
+                <img src={userData.photoURL} alt="Avatar" className="w-full h-full object-cover rounded-full" />
               ) : "🎭"}</div>
               <div className="profile-level-badge">Level {level}</div>
             </div>
 
-            <h2 className="profile-name">{editName}</h2>
+            <h2 className="profile-name">{userData?.displayName || 'Player'}</h2>
             <div className="profile-title-wrapper">
               <p className="profile-title-text">{getTitle()}</p>
               {/* Level Info Icon next to title */}

@@ -4,22 +4,17 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Users collection - each user can only read/write their own data
     match /users/{userId} {
-      // Read: User can read their own document
-      allow read: if request.auth.uid == userId;
-      
-      // Write: User can write to their own document
-      allow write: if request.auth.uid == userId;
-      
-      // Create: Allow creating new user document upon signup
-      allow create: if request.auth.uid == userId && 
-                       request.resource.data.uid == userId &&
-                       request.resource.data.createdAt == request.time;
-      
-      // Update: Allow updates only to own document
-      allow update: if request.auth.uid == userId &&
-                       resource.data.uid == userId;
-      
-      // Delete: Prevent user deletion (only admin can delete)
+      // Allow authenticated users to read their own document identified by stored `uid` field
+      // Also allow reading a non-existent doc so client can detect and create it.
+      allow read: if request.auth != null && (resource == null || resource.data.uid == request.auth.uid);
+
+      // Allow creating a user document only if the `uid` field matches the authenticated user
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+
+      // Allow updates only if the existing document's `uid` matches the authenticated user
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid;
+
+      // Prevent client-side deletes
       allow delete: if false;
     }
 
