@@ -96,11 +96,40 @@
   justify-content: center;
   cursor: pointer;
   margin: 0 auto 10px auto;
-  box-shadow: 0 8px 20px rgba(0, 191, 255, 0.25);
-  background: linear-gradient(135deg, #87CEEB 0%, #00BFFF 50%, #87CEEB 100%);
-  border: 2px solid rgba(255,255,255,0.35);
+  background: linear-gradient(145deg, #7dd3fc 0%, #38bdf8 35%, #2563eb 100%);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 10px 30px rgba(37, 99, 235, 0.35),
+    0 0 0 6px rgba(56, 189, 248, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-badge::after {
+  content: "";
+  position: absolute;
+  inset: -30px;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.35), transparent 55%);
+  transform: translateX(-15px);
+  pointer-events: none;
+}
+
+.auth-badge:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 14px 40px rgba(37, 99, 235, 0.45),
+    0 0 0 8px rgba(56, 189, 248, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.auth-badge:active {
+  transform: scale(0.98);
 }
 
 .auth-badge .auth-emoji {
   font-size: 28px;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.35));
 }
+

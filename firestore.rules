@@ -1,8 +1,37 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Users collection - each user can only read/write their own data
     match /users/{userId} {
-      allow read, write: if request.auth.uid == userId;
+      // Read: User can read their own document
+      allow read: if request.auth.uid == userId;
+      
+      // Write: User can write to their own document
+      allow write: if request.auth.uid == userId;
+      
+      // Create: Allow creating new user document upon signup
+      allow create: if request.auth.uid == userId && 
+                       request.resource.data.uid == userId &&
+                       request.resource.data.createdAt == request.time;
+      
+      // Update: Allow updates only to own document
+      allow update: if request.auth.uid == userId &&
+                       resource.data.uid == userId;
+      
+      // Delete: Prevent user deletion (only admin can delete)
+      allow delete: if false;
+    }
+
+    // Allow read-only access to public leaderboard (optional)
+    match /leaderboard/{document=**} {
+      allow read: if request.auth.uid != null;
+      allow write: if false; // Server-only operations
+    }
+
+    // Default: deny all access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

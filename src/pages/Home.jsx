@@ -182,9 +182,7 @@ const Home = () => {
         
         </div>
 
-        {!isLoggedIn && (
-          <AuthPrompt onAuthClick={() => setShowAuth(true)} />
-        )}
+
 
       </main>
 

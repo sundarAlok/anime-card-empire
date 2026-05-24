@@ -41,9 +41,11 @@ firebase.json~  # Firebase config backup
 firestore.rules~  # Rules backup
 firebaseConfig.js~  # Config backup
 src/firebase/firebaseConfig.js
+firebase/
 
 # ===============================
 # Local Storage / Browser Data
+
 # ===============================
 
 localStorage/

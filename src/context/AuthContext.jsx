@@ -1,12 +1,17 @@
 import { createContext, useState, useEffect } from "react";
 import { auth, db } from "../firebase/firebaseConfig";
-import { 
-  signInWithPopup, 
-  GoogleAuthProvider, 
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut as firebaseSignOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import {
+  loadUserDataFromFirestore,
+  initializeUserDocument,
+  saveGameState,
+} from "../services/firestoreService";
 
 export const AuthContext = createContext(null);
 
@@ -21,7 +26,7 @@ export const AuthProvider = ({ children }) => {
       if (currentUser) {
         setUser(currentUser);
         // Load user data from Firestore
-        await loadUserData(currentUser.uid);
+        await loadUserData(currentUser.uid, currentUser);
       } else {
         setUser(null);
         setUserData(null);
@@ -33,46 +38,22 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Load user data from Firestore
-  const loadUserData = async (uid) => {
+  const loadUserData = async (uid, authUser) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      if (userDoc.exists()) {
-        setUserData(userDoc.data());
-      } else {
+      let userData = await loadUserDataFromFirestore(uid);
+      
+      if (!userData) {
         // Create new user document if doesn't exist
-        await initializeUserData(uid);
+        userData = await initializeUserDocument(uid, {
+          email: authUser?.email || "",
+          displayName: authUser?.displayName || "Player",
+          photoURL: authUser?.photoURL || "",
+        });
       }
+      
+      setUserData(userData);
     } catch (error) {
       console.error("Error loading user data:", error);
-    }
-  };
-
-  // Initialize new user in Firestore
-  const initializeUserData = async (uid) => {
-    try {
-      const initialData = {
-        uid,
-        email: auth.currentUser?.email || "",
-        displayName: auth.currentUser?.displayName || "Player",
-        photoURL: auth.currentUser?.photoURL || "",
-        createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp(),
-        // Game data
-        coins: 0,
-        stars: 0,
-        highestCoins: 0,
-        tapLimit: 100,
-        level: 1,
-        streakDays: 0,
-        lastClaimDate: null,
-        cards: {},
-        nfts: {},
-      };
-
-      await setDoc(doc(db, "users", uid), initialData);
-      setUserData(initialData);
-    } catch (error) {
-      console.error("Error initializing user data:", error);
     }
   };
 
@@ -105,13 +86,15 @@ export const AuthProvider = ({ children }) => {
     if (!user) return;
 
     try {
-      await updateDoc(doc(db, "users", user.uid), {
+      await saveGameState(user.uid, gameData);
+      setUserData((prev) => ({ 
+        ...prev, 
         ...gameData,
-        lastUpdated: serverTimestamp(),
-      });
-      setUserData(prev => ({ ...prev, ...gameData }));
+        lastUpdated: new Date().toISOString()
+      }));
     } catch (error) {
       console.error("Error saving game data:", error);
+      throw error;
     }
   };
 
@@ -131,3 +114,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

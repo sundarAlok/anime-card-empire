@@ -112,24 +112,21 @@ export const GameProvider = ({ children }) => {
 
     const totalReward = dailyReward + extraReward;
 
-    setCoins(prev => prev + totalReward);
-    setStreakDays(prev => prev + 1);
+    setCoins((prev) => prev + totalReward);
+    setStreakDays((prev) => prev + 1);
     setLastClaimDate(new Date().toDateString());
-    
+
     localStorage.setItem("streakDays", (streakDays + 1).toString());
     localStorage.setItem("lastClaimDate", new Date().toDateString());
 
     return totalReward;
   };
 
-
   /* -----------------------------
      TAP LIMIT SYSTEM
   --------------------------------*/
 
-  const [tapLimit, setTapLimit] = useState(
-    GAME_CONFIG.INITIAL_TAP_LIMIT
-  );
+  const [tapLimit, setTapLimit] = useState(GAME_CONFIG.INITIAL_TAP_LIMIT);
 
   const lastRefillTimeRef = useRef(null);
 
@@ -199,7 +196,7 @@ export const GameProvider = ({ children }) => {
   const level = calculateLevel();
 
   const coinsPerTap =
-    TAP_LEVEL_DATA.find(item => item.level === level)?.coins || 1;
+    TAP_LEVEL_DATA.find((item) => item.level === level)?.coins || 1;
 
   /* -----------------------------
      INITIAL REFILL TIME
@@ -237,11 +234,10 @@ export const GameProvider = ({ children }) => {
     localStorage.setItem("nfts", JSON.stringify(nfts));
   }, [nfts]);
 
-
   /* -----------------------------
      TAP REFILL ENGINE
   --------------------------------*/
-  
+
   // Persist game data to Firestore for logged-in users
   useEffect(() => {
     if (!isLoggedIn || typeof saveGameData !== "function") return;
@@ -257,23 +253,32 @@ export const GameProvider = ({ children }) => {
         streakDays,
         lastClaimDate,
         cards,
-        nfts
+        nfts,
       };
 
       saveGameData(dataToSave);
     }, 5000); // wait 5s after the last change
 
     return () => clearTimeout(timeout);
-  }, [isLoggedIn, coins, stars, highestCoins, tapLimit, level, streakDays, lastClaimDate, cards, nfts, saveGameData]);
+  }, [
+    isLoggedIn,
+    coins,
+    stars,
+    highestCoins,
+    tapLimit,
+    level,
+    streakDays,
+    lastClaimDate,
+    cards,
+    nfts,
+    saveGameData,
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (!lastRefillTimeRef.current) return;
 
-      const result = calculateTapRefill(
-        tapLimit,
-        lastRefillTimeRef.current
-      );
+      const result = calculateTapRefill(tapLimit, lastRefillTimeRef.current);
 
       if (result.tapLimit !== tapLimit) {
         setTapLimit(result.tapLimit);
@@ -293,7 +298,7 @@ export const GameProvider = ({ children }) => {
       let totalPerHour = 0;
 
       try {
-        Object.values(cardsRef.current).forEach(card => {
+        Object.values(cardsRef.current).forEach((card) => {
           const level = Number(card?.level) || 0;
           const rate = STAR_RATES[level] ?? 0;
 
@@ -304,9 +309,7 @@ export const GameProvider = ({ children }) => {
 
         if (totalPerHour > 0) {
           const perSecond = totalPerHour / 3600;
-          setStars(prev =>
-            preciseAdd(Number(prev) || 0, perSecond)
-          );
+          setStars((prev) => preciseAdd(Number(prev) || 0, perSecond));
         }
       } catch (e) {
         console.error("Error in star engine:", e);
@@ -339,9 +342,7 @@ export const GameProvider = ({ children }) => {
 
         if (totalPerHour > 0) {
           const perSecond = totalPerHour / 3600;
-          setCoins(prev =>
-            preciseAdd(Number(prev) || 0, perSecond)
-          );
+          setCoins((prev) => preciseAdd(Number(prev) || 0, perSecond));
         }
       } catch (e) {
         console.error("Error in coin engine:", e);
@@ -356,22 +357,17 @@ export const GameProvider = ({ children }) => {
   --------------------------------*/
 
   const tap = () => {
-
     if (tapLimit <= 0) return;
 
-    setCoins(prev => {
-
+    setCoins((prev) => {
       const newAmount = prev + coinsPerTap;
 
-      setHighestCoins(highest =>
-        Math.max(highest, newAmount)
-      );
+      setHighestCoins((highest) => Math.max(highest, newAmount));
 
       return newAmount;
-
     });
 
-    setTapLimit(prev => prev - 1);
+    setTapLimit((prev) => prev - 1);
   };
 
   /* -----------------------------
@@ -398,7 +394,7 @@ export const GameProvider = ({ children }) => {
         streakDays,
         lastClaimDate,
         getDailyStreakReward,
-        claimStreak
+        claimStreak,
       }}
     >
       {children}
