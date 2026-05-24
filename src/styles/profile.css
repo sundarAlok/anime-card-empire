@@ -775,6 +775,49 @@
   box-shadow: 0 20px 50px var(--profile-primary-glow);
 }
 
+/* Inline logout section styling */
+.logout-section {
+  scroll-margin: 120px;
+}
+
+.logout-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.logout-inline-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.logout-yes, .logout-no {
+  padding: 0.6rem 1.1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  min-width: 88px;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.logout-yes {
+  background: linear-gradient(135deg, var(--profile-primary), var(--profile-secondary));
+  color: #062017;
+  box-shadow: 0 8px 30px rgba(16,185,129,0.18);
+}
+
+.logout-yes:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(16,185,129,0.22); }
+
+.logout-no {
+  background: transparent;
+  color: var(--profile-text-primary);
+  border: 1.5px solid rgba(255,255,255,0.08);
+}
+
+.logout-no:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.16); }
+
 .profile-section-title {
   font-size: 1.25rem;
   font-weight: 700;

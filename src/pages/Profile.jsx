@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 
 import HelpSupportOverlay from "../components/HelpSupportOverlay";
@@ -7,6 +8,7 @@ import PrivacyOverlay from "../components/PrivacyOverlay";
 
 // importing files
 import { useGame } from "../context/useGame";
+import { useAuth } from "../context/useAuth";
 import SharedHeader from "../components/SharedHeader";
 import "../styles/profile.css";
 import "../styles/home.css";
@@ -29,6 +31,7 @@ import helpImg from "../assets/profile/help.png";
 import languageImg from "../assets/profile/language.png";
 import termsImg from "../assets/profile/terms.png";
 import privacyImg from "../assets/profile/security.png";
+import logoutImg from "../assets/profile/logout.png";
 
 // fontawsome icon
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -139,6 +142,48 @@ const LEVEL_DATA = [
 
 const Profile = () => {
   const { stars, coins, highestCoins, cards, nfts } = useGame();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showLogoutMessage, setShowLogoutMessage] = useState(false);
+  const [showLogoutSection, setShowLogoutSection] = useState(false);
+  const [showLanguage, setShowLanguage] = useState(false);
+  const logoutSectionRef = useRef(null);
+
+  const doLogout = async () => {
+    try {
+      await signOut();
+      setShowLogoutMessage(true);
+      setTimeout(() => navigate('/'), 3000);
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
+  };
+
+  useEffect(() => {
+    if (showLogoutSection && logoutSectionRef.current) {
+      try {
+        logoutSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // also gently focus the section for accessibility
+        logoutSectionRef.current.focus?.();
+      } catch (err) {
+        // fallback: jump to bottom
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    }
+  }, [showLogoutSection]);
+
+  const handleLogoutClick = () => {
+    // Try to show the in-app confirmation modal; if something throws, fallback to window.confirm
+    try {
+      setShowLogoutConfirm(true);
+    } catch (err) {
+      console.warn('Modal unavailable, falling back to window.confirm', err);
+      if (window.confirm('Are you sure you want to logout?')) {
+        doLogout();
+      }
+    }
+  };
   const [notifications, setNotifications] = useState(true);
   const [sound, setSound] = useState(true);
   const [showLevelInfo, setShowLevelInfo] = useState(false);
@@ -667,8 +712,73 @@ const Profile = () => {
               </div>
               <span className="profile-setting-arrow cursor-pointer" onClick={() => setShowPrivacy(true)}>→</span>
             </div>
+            {/* Logout Item (opens confirmation) */}
+            <div className="profile-setting-item logout">
+              <div className="profile-setting-info">
+                <img src={logoutImg} alt="Logout" className="profile-setting-icon" />
+                <span className="profile-setting-text">Logout</span>
+              </div>
+              <span className="profile-setting-arrow cursor-pointer" onClick={() => setShowLogoutSection(true)}>→</span>
+            </div>
           </div>
         </div>
+        {/* Inline logout confirmation section (appears below Settings) */}
+        {showLogoutSection && (
+          <div ref={logoutSectionRef} className="profile-section logout-section">
+            <h3 className="profile-section-title">Logout</h3>
+            <div className="logout-inline">
+              <p>Are you sure you want to logout?</p>
+              <div className="logout-inline-actions">
+                <button
+                  className="logout-yes"
+                  onClick={async () => {
+                    await doLogout();
+                    setShowLogoutSection(false);
+                  }}
+                >
+                  Yes
+                </button>
+                <button className="logout-no" onClick={() => setShowLogoutSection(false)}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Logout Confirmation Modal */}
+        {showLogoutConfirm && createPortal(
+          <div className="logout-confirm-overlay" onClick={() => setShowLogoutConfirm(false)}>
+            <div className="logout-confirm-modal" onClick={(e) => e.stopPropagation()}>
+              <h3 className="logout-confirm-title">Are you sure?</h3>
+              <p className="logout-confirm-text">You will be logged out of your account.</p>
+              <div className="logout-confirm-actions">
+                <button
+                  className="logout-yes"
+                  onClick={async () => {
+                    setShowLogoutConfirm(false);
+                    try {
+                      await signOut();
+                      setShowLogoutMessage(true);
+                      setTimeout(() => navigate('/'), 3000);
+                    } catch (err) {
+                      console.error('Logout failed', err);
+                    }
+                  }}
+                >
+                  Yes
+                </button>
+                <button className="logout-no" onClick={() => setShowLogoutConfirm(false)}>No</button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* Logged out message + redirect */}
+        {showLogoutMessage && createPortal(
+          <div className="logout-message-overlay">
+            <div className="logout-message">You are logged out. Redirecting to home...</div>
+          </div>,
+          document.body
+        )}
       </div>
     </div>
   );
