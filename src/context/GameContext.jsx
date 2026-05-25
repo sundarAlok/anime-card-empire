@@ -149,8 +149,12 @@ export const GameProvider = ({ children }) => {
      TAP LIMIT SYSTEM
   --------------------------------*/
 
-  const [tapLimit, setTapLimit] = useState(GAME_CONFIG.INITIAL_TAP_LIMIT);
+  const [tapLimit, setTapLimit] = useState(() => {
+    const saved = localStorage.getItem("tapLimit");
+    return saved ? Number(saved) : GAME_CONFIG.INITIAL_TAP_LIMIT;
+  });
 
+  const [lastRefillTimeLoaded, setLastRefillTimeLoaded] = useState(false);
   const lastRefillTimeRef = useRef(null);
 
   /* -----------------------------
@@ -193,7 +197,25 @@ export const GameProvider = ({ children }) => {
       setCoins(Number(userData.coins) || 0);
       setStars(Number(userData.stars) || 0);
       setHighestCoins(Number(userData.highestCoins) || 0);
-      setTapLimit(userData.tapLimit ?? GAME_CONFIG.INITIAL_TAP_LIMIT);
+      const userTapLimit = userData.tapLimit ?? GAME_CONFIG.INITIAL_TAP_LIMIT;
+      setTapLimit(userTapLimit);
+
+      // Restore last refill time from server data or localStorage
+      const savedLocal = localStorage.getItem("lastRefillTime");
+      lastRefillTimeRef.current =
+        userData.lastRefillTime ?? (savedLocal ? Number(savedLocal) : Date.now());
+
+      // Apply refill immediately after loading saved values
+      try {
+        const result = calculateTapRefill(userTapLimit, lastRefillTimeRef.current);
+        if (result.tapLimit !== userTapLimit) {
+          setTapLimit(result.tapLimit);
+        }
+        lastRefillTimeRef.current = result.lastRefillTime;
+        localStorage.setItem("lastRefillTime", String(lastRefillTimeRef.current));
+      } catch (e) {
+        console.error("Error applying tap refill on login:", e);
+      }
       setStreakDays(userData.streakDays ?? 0);
       setLastClaimDate(userData.lastClaimDate ?? null);
       setCards(userData.cards || {});
@@ -226,7 +248,23 @@ export const GameProvider = ({ children }) => {
   --------------------------------*/
 
   useEffect(() => {
-    lastRefillTimeRef.current = Date.now();
+    // Try to restore last refill time from localStorage so taps refill while app was closed
+    const saved = localStorage.getItem("lastRefillTime");
+    lastRefillTimeRef.current = saved ? Number(saved) : Date.now();
+
+    // Apply any pending refills immediately on startup
+    try {
+      const result = calculateTapRefill(tapLimit, lastRefillTimeRef.current);
+      if (result.tapLimit !== tapLimit) {
+        setTapLimit(result.tapLimit);
+      }
+      lastRefillTimeRef.current = result.lastRefillTime;
+      localStorage.setItem("lastRefillTime", String(lastRefillTimeRef.current));
+    } catch (e) {
+      console.error("Error applying initial tap refill:", e);
+    }
+
+    setLastRefillTimeLoaded(true);
   }, []);
 
   /* -----------------------------
@@ -277,6 +315,8 @@ export const GameProvider = ({ children }) => {
         lastClaimDate,
         cards,
         nfts,
+        // persist last refill time so server can compute refills while app was closed
+        lastRefillTime: lastRefillTimeRef.current,
       };
 
       // Attach a local timestamp so server-side transaction can avoid overwriting newer data
@@ -308,10 +348,25 @@ export const GameProvider = ({ children }) => {
       if (result.tapLimit !== tapLimit) {
         setTapLimit(result.tapLimit);
         lastRefillTimeRef.current = result.lastRefillTime;
+        try {
+          localStorage.setItem("lastRefillTime", String(lastRefillTimeRef.current));
+          localStorage.setItem("tapLimit", String(result.tapLimit));
+        } catch (e) {
+          console.error("Error saving refill state to localStorage:", e);
+        }
       }
     }, 1000);
 
     return () => clearInterval(interval);
+  }, [tapLimit]);
+
+  // Persist tapLimit to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("tapLimit", String(tapLimit));
+    } catch (e) {
+      console.error("Error saving tapLimit to localStorage:", e);
+    }
   }, [tapLimit]);
 
   /* -----------------------------

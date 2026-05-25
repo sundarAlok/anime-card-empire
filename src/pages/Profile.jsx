@@ -200,7 +200,38 @@ const Profile = () => {
   // “Owned cards” = cards where upgrade level >= 10
   const cardCount = Object.values(cards || {}).filter(c => (c?.level ?? 0) >= 10).length;
   const nftCount = Object.values(nfts).filter(Boolean).length;
-  const memberSince = "January 2025";
+
+  const computeMemberSince = () => {
+    // Prefer Firestore `createdAt`, fall back to Auth `metadata.creationTime`
+    try {
+      const createdAt = userData?.createdAt;
+      let dateObj = null;
+
+      if (createdAt) {
+        // Firestore Timestamp
+        if (typeof createdAt.toDate === 'function') {
+          dateObj = createdAt.toDate();
+        } else if (createdAt.seconds) {
+          dateObj = new Date(createdAt.seconds * 1000);
+        } else {
+          dateObj = new Date(createdAt);
+        }
+      } else if (user?.metadata?.creationTime) {
+        dateObj = new Date(user.metadata.creationTime);
+      }
+
+      if (!dateObj || Number.isNaN(dateObj.getTime())) return null;
+
+      const monthName = dateObj.toLocaleString(undefined, { month: 'long' });
+      const year = dateObj.getFullYear();
+      return `${monthName} ${year}`;
+    } catch (e) {
+      console.error('Error computing memberSince:', e);
+      return null;
+    }
+  };
+
+  const memberSince = computeMemberSince();
 
   // Calculate level based on highest coins ever earned
   const calculateLevel = () => {

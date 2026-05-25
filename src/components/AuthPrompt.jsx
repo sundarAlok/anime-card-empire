@@ -11,6 +11,7 @@ const AuthPrompt = ({ onAuthClick }) => {
     <div className="auth-prompt-container">
       <div className="auth-badge" onClick={onAuthClick} title="Sign in with Google">
         <span className="auth-emoji">🔐</span>
+        <span className="auth-label">SignIn</span>
       </div>
     </div>
   );

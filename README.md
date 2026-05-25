@@ -36,6 +36,15 @@
 - ⚡ **Fast Dev Experience**: Vite HMR, ESLint, optimized utils (math, cooldown, security)
 - 🎨 **Overlays & Modals**: Streak bonuses, Help/Support, Terms/Privacy policies
 
+### Private NFT image delivery (Vercel + GitHub)
+
+- ✅ Serverless proxy: `api/github-proxy.js` (deployed to Vercel) can fetch images from a private GitHub repo using a fine-grained token.
+- ✅ Client fetching + caching: `src/services/nftService.js` handles on-demand fetch and Cache Storage caching for blobs.
+- ✅ Fallback behavior: `src/pages/NFTMarketplace.jsx` uses `default_nft.png` as the immediate fallback; private filenames (e.g. `Luffy_NFT.png`) are attempted via the proxy and will replace the fallback when available.
+- To enable: Deploy to Vercel and set these environment variables for your project: `GITHUB_TOKEN` (fine-grained, `Contents: Read`), `GH_OWNER`, `GH_REPO`.
+- Place NFT image files at the repository root (e.g. `Nami_NFT.png`, `Robin_NFT.png`, `Sanji_NFT.png`, `Zoro_NFT.png`, `Luffy_NFT.png`). Add new names to `src/pages/NFTMarketplace.jsx` `PRIVATE_NFT_FILENAMES` when you upload more images.
+- Optional local encryption helper: `encrypt.cjs` is provided if you prefer to encrypt images locally before storing ciphertext elsewhere (AES-256-CBC example).
+
 ## 🛠 Tech Stack
 
 | Frontend | Build | Styles | Backend | Utils |
