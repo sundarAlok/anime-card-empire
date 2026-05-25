@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useContext } from "react";
 import { GameContext } from "../context/GameContext";
@@ -8,51 +8,16 @@ import "../styles/home.css";
 import "../styles/SharedHeader.css";
 
 import starImg from "../assets/common/stars.png";
-// import zenitsuImg from "../assets/cards/zenitsu.jpg";
-// import namiImg from "../assets/cards/nami.jpg";
-// import tienImg from "../assets/cards/tien.jpg";
-// import sakuraImg from "../assets/cards/sakura_haruno.png";
-// import leviImg from "../assets/cards/levi_ackerman.png";
-// import lImg from "../assets/cards/l.png";
-// import zoroImg from "../assets/cards/roronoa_zoro.jpg";
-// import tanjiroImg from "../assets/cards/tanjiro.jpg";
-// import yujiImg from "../assets/cards/yuji_itadori.jpg";
-// import sasukeImg from "../assets/cards/sasuke_uchiha.jpeg";
-// import ichigoImg from "../assets/cards/ichigo.jpg";
-// import sanjiImg from "../assets/cards/sanji.jpg";
-// import gojoImg from "../assets/cards/satoru_gojo.jpg";
-// import gokuImg from "../assets/cards/goku.jpg";
-// import luffyImg from "../assets/cards/luffy.jpg";
-// import saitamaImg from "../assets/cards/saitama.jpg";
-// import rimuruImg from "../assets/cards/rimuru.jpg";
-// import jinwooImg from "../assets/cards/jinwoo.jpg";
-// import killuaImg from "../assets/cards/killua.jpg";
-// import edwardImg from "../assets/cards/edward_elric.jpg";
+import defaultNft from "../assets/nft/default_nft.png";
 
-// for testing purpose, remove it later
-import zenitsuImg from "../assets/cards/luffy.jpg";
-import namiImg from "../assets/cards/luffy.jpg";
-import tienImg from "../assets/cards/luffy.jpg";
-import robinImg from "../assets/cards/luffy.jpg";
-import sakuraImg from "../assets/cards/luffy.jpg";
-import leviImg from "../assets/cards/luffy.jpg";
-import lImg from "../assets/cards/luffy.jpg";
-import zoroImg from "../assets/cards/luffy.jpg";
-import tanjiroImg from "../assets/cards/luffy.jpg";
-import yujiImg from "../assets/cards/luffy.jpg";
-import sasukeImg from "../assets/cards/luffy.jpg";
-import ichigoImg from "../assets/cards/luffy.jpg";
-import sanjiImg from "../assets/cards/luffy.jpg";
-import gojoImg from "../assets/cards/luffy.jpg";
-import gokuImg from "../assets/cards/luffy.jpg";
-import luffyImg from "../assets/cards/luffy.jpg";
-import saitamaImg from "../assets/cards/luffy.jpg";
-import rimuruImg from "../assets/cards/luffy.jpg";
-import jinwooImg from "../assets/cards/luffy.jpg";
-import killuaImg from "../assets/cards/luffy.jpg";
-import edwardImg from "../assets/cards/luffy.jpg";
-
-// NFT Data
+// List of private repo filenames (add names here as you upload to the private repo)
+const PRIVATE_NFT_FILENAMES = [
+  'Nami_NFT.png',
+  'Robin_NFT.png',
+  'Sanji_NFT.png',
+  'Zoro_NFT.png',
+  'Luffy_NFT.png',
+];
 const NFT_DATA = [
   // Common
   {
@@ -60,7 +25,7 @@ const NFT_DATA = [
     name: "Zenitsu Agatsuma",
     anime: "Demon Slayer",
     info: "Zenitsu may appear cowardly, but when he awakens from his fear, his Thunderclap and Flash strikes with unmatched speed and precision.",
-    image: zenitsuImg,
+    image: defaultNft,
     rarity: "common",
     price: 163,
     totalSupply: 198,
@@ -77,7 +42,7 @@ const NFT_DATA = [
     name: "Nami",
     anime: "One Piece",
     info: "Nami is a brilliant navigator and a cunning strategist, always finding a way to turn the tides in the heat of battle or on the seas.",
-    image: namiImg,
+    image: 'Nami_NFT.png',
     rarity: "common",
     price: 241,
     totalSupply: 212,
@@ -94,7 +59,7 @@ const NFT_DATA = [
     name: "Tien Shinhan",
     anime: "Dragon Ball",
     info: "Tien’s discipline and martial arts mastery make him a formidable fighter, capable of precision strikes and incredible focus in the heat of battle.",
-    image: tienImg,
+    image: defaultNft,
     rarity: "common",
     price: 212,
     totalSupply: 243,
@@ -107,28 +72,28 @@ const NFT_DATA = [
     ]
   },
   {
-  id: "nft_robin_common",
-  name: "Nico Robin",
-  anime: "One Piece",
-  info: "Nico Robin is a brilliant archaeologist and the sole survivor of Ohara, using the powers of the Hana Hana no Mi and her vast knowledge to uncover the world's hidden history.",
-  image: robinImg,
-  rarity: "common",
-  price: 256,
-  totalSupply: 202,
-  quotes: [
-    "I want to live! Take me out to sea with you!",
-    "Fools who do not respect the past are doomed to repeat it.",
-    "History may repeat itself, but humans cannot return to the past.",
-    "When you have a hard time, just laugh.",
-    "There is no such thing as being born into the world to be alone."
-  ]
-},
+    id: "nft_robin_common",
+    name: "Nico Robin",
+    anime: "One Piece",
+    info: "Nico Robin is a brilliant archaeologist and the sole survivor of Ohara, using the powers of the Hana Hana no Mi and her vast knowledge to uncover the world's hidden history.",
+    image: 'Robin_NFT.png',
+    rarity: "common",
+    price: 256,
+    totalSupply: 202,
+    quotes: [
+      "I want to live! Take me out to sea with you!",
+      "Fools who do not respect the past are doomed to repeat it.",
+      "History may repeat itself, but humans cannot return to the past.",
+      "When you have a hard time, just laugh.",
+      "There is no such thing as being born into the world to be alone."
+    ]
+  },
   {
     id: "nft_sakura_common",
     name: "Sakura Haruno",
     anime: "Naruto",
     info: "Sakura combines raw strength and medical ninja skills, turning her into a powerful force capable of healing allies and dominating enemies.",
-    image: sakuraImg,
+    image: defaultNft,
     rarity: "common",
     price: 178,
     totalSupply: 225,
@@ -145,7 +110,7 @@ const NFT_DATA = [
     name: "Levi Ackerman",
     anime: "Attack on Titan",
     info: "Levi, humanity’s strongest soldier, wields unmatched speed and precision against titans, always remaining calm and deadly in battle.",
-    image: leviImg,
+    image: defaultNft,
     rarity: "common",
     price: 189,
     totalSupply: 193,
@@ -162,7 +127,7 @@ const NFT_DATA = [
     name: "L",
     anime: "Death Note",
     info: "L is the world’s greatest detective, solving the most complex mysteries with astonishing logic and a mind that never rests.",
-    image: lImg,
+    image: defaultNft,
     rarity: "common",
     price: 203,
     totalSupply: 197,
@@ -176,12 +141,12 @@ const NFT_DATA = [
   },
 
   // Enhanced
- {
+  {
     id: "nft_sanji_enhanced",
     name: "Sanji",
     anime: "One Piece",
     info: "Sanji is a master chef and fighter, delivering lethal kicks with unmatched speed while protecting those he loves with unwavering loyalty.",
-    image: sanjiImg,
+    image: 'Sanji_NFT.png',
     rarity: "enhanced",
     price: 353,
     totalSupply: 143,
@@ -198,7 +163,7 @@ const NFT_DATA = [
     name: "Tanjiro Kamado",
     anime: "Demon Slayer",
     info: "Tanjiro fights with compassion and strength, using his Water and Sun Breathing techniques to protect his friends and defeat demons.",
-    image: tanjiroImg,
+    image: defaultNft,
     rarity: "enhanced",
     price: 392,
     totalSupply: 115,
@@ -215,7 +180,7 @@ const NFT_DATA = [
     name: "Yuji Itadori",
     anime: "Jujutsu Kaisen",
     info: "Yuji is a vessel of immense power, combining courage, compassion, and unstoppable energy to face curses far beyond ordinary human limits.",
-    image: yujiImg,
+    image: defaultNft,
     rarity: "enhanced",
     price: 381,
     totalSupply: 134,
@@ -232,7 +197,7 @@ const NFT_DATA = [
     name: "Sasuke Uchiha",
     anime: "Naruto",
     info: "Sasuke, the avenger, pursues power relentlessly, mastering his Sharingan and Rinnegan to challenge fate itself and protect what he values.",
-    image: sasukeImg,
+    image: defaultNft,
     rarity: "enhanced",
     price: 368,
     totalSupply: 121,
@@ -249,7 +214,7 @@ const NFT_DATA = [
     name: "Ichigo Kurosaki",
     anime: "Bleach",
     info: "Ichigo wields the power of both humans and spirits, bridging worlds to protect those who cannot defend themselves, always with courage and conviction.",
-    image: ichigoImg,
+    image: defaultNft,
     rarity: "enhanced",
     price: 472,
     totalSupply: 145,
@@ -266,7 +231,7 @@ const NFT_DATA = [
     name: "Edward Elric",
     anime: "Fullmetal Alchemist",
     info: "Edward’s mastery of alchemy and relentless determination allow him to achieve feats others could only dream of, driven by love and loyalty.",
-    image: edwardImg,
+    image: defaultNft,
     rarity: "enhanced",
     price: 399,
     totalSupply: 111,
@@ -285,7 +250,7 @@ const NFT_DATA = [
     name: "Rimuru Tempest",
     anime: "That Time I Got Reincarnated as a Slime",
     info: "Rimuru is a cunning and powerful slime lord, capable of absorbing skills and adapting to any situation, proving intelligence is the ultimate weapon.",
-    image: rimuruImg,
+    image: defaultNft,
     rarity: "elite",
     price: 580,
     totalSupply: 76,
@@ -302,7 +267,7 @@ const NFT_DATA = [
     name: "Killua Zoldyck",
     anime: "Hunter x Hunter",
     info: "Killua, a prodigy assassin, blends agility, strategy, and lightning-fast reflexes to overcome foes much stronger than himself.",
-    image: killuaImg,
+    image: defaultNft,
     rarity: "elite",
     price: 512,
     totalSupply: 69,
@@ -319,7 +284,7 @@ const NFT_DATA = [
     name: "Satoru Gojo",
     anime: "Jujutsu Kaisen",
     info: "Gojo is the most powerful sorcerer alive, his limitless abilities and overwhelming confidence make him untouchable in battle.",
-    image: gojoImg,
+    image: defaultNft,
     rarity: "elite",
     price: 599,
     totalSupply: 72,
@@ -336,7 +301,7 @@ const NFT_DATA = [
     name: "Roronoa Zoro",
     anime: "One Piece",
     info: "Zoro is a master swordsman whose ambition to become the world’s greatest is matched only by his unbreakable determination and spirit.",
-    image: zoroImg,
+    image: 'Zoro_NFT.png',
     rarity: "elite",
     price: 552,
     totalSupply: 78,
@@ -355,7 +320,7 @@ const NFT_DATA = [
     name: "Sung Jin-Woo",
     anime: "Solo Leveling",
     info: "Jin-Woo rises as the Shadow Monarch, overcoming insurmountable odds with cunning, strength, and an army that bends to his will.",
-    image: jinwooImg,
+    image: defaultNft,
     rarity: "eternal",
     price: 873,
     totalSupply: 22,
@@ -372,7 +337,7 @@ const NFT_DATA = [
     name: "Son Goku",
     anime: "Dragon Ball",
     info: "Goku reaches legendary heights with Ultra Instinct, never stopping in the pursuit of strength and adventure, inspiring all who witness his power.",
-    image: gokuImg,
+    image: defaultNft,
     rarity: "eternal",
     price: 881,
     totalSupply: 18,
@@ -389,7 +354,7 @@ const NFT_DATA = [
     name: "Monkey D. Luffy",
     anime: "One Piece",
     info: "Luffy, the future Pirate King, overcomes all challenges with his indomitable will and stretches his body and limits to achieve his dreams.",
-    image: luffyImg,
+    image: 'Luffy_NFT.png',
     rarity: "eternal",
     price: 862,
     totalSupply: 12,
@@ -406,7 +371,7 @@ const NFT_DATA = [
     name: "Saitama",
     anime: "One Punch Man",
     info: "Saitama possesses limitless strength, defeating any opponent effortlessly while maintaining a desire to find a true challenge.",
-    image: saitamaImg,
+    image: defaultNft,
     rarity: "eternal",
     price: 892,
     totalSupply: 15,
@@ -440,6 +405,8 @@ const RARITY_REWARDS = {
 
 const NFTMarketplace = () => {
   const { stars, setStars, coins, setCoins, nfts = {}, setNfts } = useContext(GameContext);
+  const [imageMap, setImageMap] = useState({}); // nftId -> objectURL or src
+  const observers = useRef(new Map());
   const [activeFilter, setActiveFilter] = useState("all");
   const [purchaseStatus, setPurchaseStatus] = useState({});
   const [infoTooltip, setInfoTooltip] = useState(null);
@@ -456,6 +423,71 @@ const NFTMarketplace = () => {
     if (activeFilter === "owned") return NFT_DATA.filter(nft => isOwned(nft.id));
     return NFT_DATA.filter(nft => nft.rarity === activeFilter);
   };
+
+  const loadImageForNft = useCallback(async (nft) => {
+    try {
+      if (imageMap[nft.id]) return;
+
+      // If nft.image is not a string (imported asset URL), use it directly
+      if (typeof nft.image !== 'string') {
+        setImageMap(prev => ({ ...prev, [nft.id]: nft.image }));
+        return;
+      }
+
+      const imgStr = nft.image;
+      const looksLikePath = imgStr.includes('/') || imgStr.startsWith('http') || imgStr.startsWith('.');
+      if (looksLikePath) {
+        setImageMap(prev => ({ ...prev, [nft.id]: imgStr }));
+        return;
+      }
+
+      // nft.image is a bare filename (e.g. 'Luffy_NFT.png') — fetch via proxy
+      const filename = imgStr;
+      const cacheKey = `/nft-cache/${filename}`;
+      const cached = await getCachedBlob(cacheKey);
+      if (cached) {
+        const url = URL.createObjectURL(cached);
+        setImageMap(prev => ({ ...prev, [nft.id]: url }));
+        return;
+      }
+
+      const blob = await fetchPrivateImage(filename);
+      await cacheBlob(cacheKey, blob);
+      const url = URL.createObjectURL(blob);
+      setImageMap(prev => ({ ...prev, [nft.id]: url }));
+    } catch (err) {
+      console.warn('Failed to load image for', nft.id, err);
+    }
+  }, [imageMap]);
+
+  // IntersectionObserver callback to lazy-load
+  const handleObserve = useCallback((el, nft) => {
+    if (!el) return;
+    if (observers.current.has(nft.id)) return; // already observing
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadImageForNft(nft);
+          const obs = observers.current.get(nft.id);
+          if (obs) { obs.disconnect(); observers.current.delete(nft.id); }
+        }
+      });
+    }, { rootMargin: '200px' });
+    io.observe(el);
+    observers.current.set(nft.id, io);
+  }, [loadImageForNft]);
+
+  // cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(imageMap).forEach(src => {
+        try { if (src && src.startsWith('blob:')) URL.revokeObjectURL(src); } catch (e) {}
+      });
+      // disconnect any observers
+      observers.current.forEach((o) => { try { o.disconnect(); } catch (e) {} });
+      observers.current.clear();
+    };
+  }, [imageMap]);
 
   const handlePurchase = (nft) => {
 
@@ -597,15 +629,18 @@ const NFTMarketplace = () => {
           const statusClass = owned ? "owned" : canAfford ? "available" : "unavailable";
           const starsNeeded = Math.max(0, nft.price - Math.floor(stars));
 
+          const resolvedSrc = imageMap[nft.id] || (typeof nft.image === 'string' ? defaultNft : nft.image) || defaultNft;
+          const downloadHref = imageMap[nft.id] || (typeof nft.image === 'string' ? `/api/github-proxy?path=${encodeURIComponent(nft.image)}` : nft.image) || defaultNft;
+
           return (
             <div key={nft.id} className={`nft-card ${nft.rarity} ${owned ? 'owned' : ''}`}>
               {/* Image Section */}
-              <div className="nft-image-section">
+              <div className="nft-image-section" ref={(el) => handleObserve(el, nft)}>
                 <div className="nft-image-bg" />
 
 {owned ? (
                   <img
-                    src={nft.image}
+                    src={resolvedSrc}
                     alt={nft.name}
                     className="nft-image nft-image-unlocked"
                     draggable={false}
@@ -616,7 +651,7 @@ const NFTMarketplace = () => {
                 ) : (
                   <div className="nft-locked-placeholder" aria-hidden="true">
                     <img
-                      src={nft.image}
+                      src={resolvedSrc}
                       alt=""
                       className="nft-image nft-image-locked"
                       draggable={false}
@@ -671,7 +706,7 @@ const NFTMarketplace = () => {
                   {owned ? (
                     <a
                       className={`nft-purchase owned`}
-                      href={nft.image}
+                      href={downloadHref}
                       download={`${nft.name}.png`}
                       onContextMenu={(e) => e.preventDefault()}
                       draggable={false}

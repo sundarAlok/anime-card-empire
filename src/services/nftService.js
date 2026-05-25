@@ -1,3 +1,23 @@
+// Helper to fetch private images via the serverless proxy and cache them
+export async function fetchPrivateImage(path, idToken = null) {
+  const url = `/api/github-proxy?path=${encodeURIComponent(path)}`;
+  const headers = idToken ? { Authorization: `Bearer ${idToken}` } : {};
+  const resp = await fetch(url, { headers });
+  if (!resp.ok) throw new Error('Fetch failed');
+  return await resp.blob();
+}
+
+// Cache a blob in Cache Storage under a predictable key
+export async function cacheBlob(key, blob) {
+  const cache = await caches.open('nft-images');
+  await cache.put(key, new Response(blob));
+}
+
+export async function getCachedBlob(key) {
+  const cache = await caches.open('nft-images');
+  const res = await cache.match(key);
+  return res ? await res.blob() : null;
+}
 import {
   getUserNFTs,
   saveUserNFTs,
