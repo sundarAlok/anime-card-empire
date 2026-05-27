@@ -58,6 +58,8 @@ export const initializeUserDocument = async (uid, profileDefaults = {}) => {
       level: 1,
       streakDays: 0,
       lastClaimDate: null,
+      lastRefillTime: Date.now(),
+      lastResourceUpdateTime: Date.now(),
       // Collections stored as subcollections or nested objects
       cards: {},
       nfts: {},
@@ -124,6 +126,10 @@ export const saveGameState = async (uid, gameData, localUpdateTimeMs = null) => 
           tapLimit: gameData.tapLimit ?? 100,
           streakDays: gameData.streakDays ?? 0,
           lastClaimDate: gameData.lastClaimDate ?? null,
+          lastRefillTime: gameData.lastRefillTime ?? Date.now(),
+          lastResourceUpdateTime: gameData.lastResourceUpdateTime ?? Date.now(),
+          cards: gameData.cards ?? {},
+          nfts: gameData.nfts ?? {},
           lastUpdated: serverTimestamp(),
         });
         return;
@@ -145,6 +151,10 @@ export const saveGameState = async (uid, gameData, localUpdateTimeMs = null) => 
         tapLimit: gameData.tapLimit ?? 100,
         streakDays: gameData.streakDays ?? 0,
         lastClaimDate: gameData.lastClaimDate ?? null,
+        lastRefillTime: gameData.lastRefillTime ?? serverData.lastRefillTime ?? Date.now(),
+        lastResourceUpdateTime: gameData.lastResourceUpdateTime ?? serverData.lastResourceUpdateTime ?? Date.now(),
+        cards: gameData.cards ?? serverData.cards ?? {},
+        nfts: gameData.nfts ?? serverData.nfts ?? {},
         lastUpdated: serverTimestamp(),
       });
     });
@@ -174,6 +184,10 @@ export const loadGameState = async (uid) => {
       tapLimit: data.tapLimit || 100,
       streakDays: data.streakDays || 0,
       lastClaimDate: data.lastClaimDate || null,
+      lastRefillTime: data.lastRefillTime || null,
+      lastResourceUpdateTime: data.lastResourceUpdateTime || null,
+      cards: data.cards || {},
+      nfts: data.nfts || {},
     };
   } catch (error) {
     console.error("Error loading game state:", error);

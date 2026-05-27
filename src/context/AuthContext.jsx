@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const userSnapshotUnsub = useRef(null);
+  const lastLocalSaveMs = useRef(null);
 
   // Monitor auth state
   useEffect(() => {
@@ -41,10 +42,21 @@ export const AuthProvider = ({ children }) => {
         // Attach a realtime listener to the user's document so changes sync across clients
         const scopedUid = getScopedUid(currentUser.uid);
         const userDocRef = doc(db, "users", scopedUid);
-        userSnapshotUnsub.current = onSnapshot(userDocRef, async (snap) => {
-          if (snap && snap.exists()) {
-            setUserData(snap.data());
-          } else {
+          userSnapshotUnsub.current = onSnapshot(userDocRef, async (snap) => {
+            if (snap && snap.exists()) {
+              try {
+                const serverData = snap.data();
+                const serverLast = serverData.lastUpdated && serverData.lastUpdated.toMillis ? serverData.lastUpdated.toMillis() : null;
+                // If we recently performed a local save, avoid applying older server snapshot that would overwrite local state
+                if (lastLocalSaveMs.current && serverLast && serverLast < lastLocalSaveMs.current) {
+                  // skip applying this snapshot because local save is newer
+                  return;
+                }
+                setUserData(serverData);
+              } catch (e) {
+                console.error('Error processing user snapshot:', e);
+              }
+            } else {
             // Create user doc if missing
             try {
               const initial = await initializeUserDocument(currentUser.uid, {
@@ -159,6 +171,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Accept optional local timestamp for conflict resolution
       const localTs = gameData && gameData._localUpdateTimeMs ? gameData._localUpdateTimeMs : null;
+      if (localTs) lastLocalSaveMs.current = localTs;
       // Remove internal field before sending
       if (localTs) delete gameData._localUpdateTimeMs;
       await saveGameState(user.uid, gameData, localTs);

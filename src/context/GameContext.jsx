@@ -54,6 +54,73 @@ const LEVEL_THRESHOLDS = [
   { level: 16, coins: 100000000 },
 ];
 
+const getSafeLastRefillTime = (savedTime, currentTapLimit) => {
+  if (typeof savedTime === "number" && savedTime > 0) {
+    return savedTime;
+  }
+
+  if (currentTapLimit < GAME_CONFIG.INITIAL_TAP_LIMIT) {
+    return (
+      Date.now() -
+      GAME_CONFIG.TAP_REFILL_INTERVAL_MS *
+        (GAME_CONFIG.INITIAL_TAP_LIMIT - currentTapLimit)
+    );
+  }
+
+  return Date.now();
+};
+
+const getCardCoinRatePerHour = (cards) => {
+  let total = 0;
+  try {
+    Object.entries(cards || {}).forEach(([cardId, cardData]) => {
+      const level = Number(cardData?.level) || 0;
+      const cardRewards = CARD_REWARDS_MAP[cardId];
+      if (cardRewards && level >= 1 && level <= 3) {
+        total += Number(cardRewards.coin[level - 1] ?? 0);
+      }
+    });
+  } catch (e) {
+    console.error("Error calculating card coin rate:", e);
+  }
+  return total;
+};
+
+const getCardStarRatePerHour = (cards) => {
+  let total = 0;
+  try {
+    Object.values(cards || {}).forEach((cardData) => {
+      const level = Number(cardData?.level) || 0;
+      if (level >= 4) {
+        total += Number(STAR_RATES[level] ?? 0);
+      }
+    });
+  } catch (e) {
+    console.error("Error calculating card star rate:", e);
+  }
+  return total;
+};
+
+const calculateOfflineResourceGain = (cards, elapsedMs) => {
+  const elapsedSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
+  if (elapsedSeconds <= 0) return { coins: 0, stars: 0 };
+
+  const coinsPerHour = getCardCoinRatePerHour(cards);
+  const starsPerHour = getCardStarRatePerHour(cards);
+
+  return {
+    coins: preciseAdd(0, (coinsPerHour * elapsedSeconds) / 3600),
+    stars: preciseAdd(0, (starsPerHour * elapsedSeconds) / 3600),
+  };
+};
+
+const getSafeLastResourceUpdateTime = (savedTime) => {
+  if (typeof savedTime === "number" && savedTime > 0) {
+    return savedTime;
+  }
+  return Date.now();
+};
+
 export const GameProvider = ({ children }) => {
   const { isLoggedIn, userData, saveGameData } = useAuth();
 
@@ -156,6 +223,8 @@ export const GameProvider = ({ children }) => {
 
   const [lastRefillTimeLoaded, setLastRefillTimeLoaded] = useState(false);
   const lastRefillTimeRef = useRef(null);
+  const lastResourceUpdateTimeRef = useRef(null);
+  const offlineGainSourceRef = useRef(null);
 
   /* -----------------------------
      CARDS + NFTS
@@ -194,16 +263,29 @@ export const GameProvider = ({ children }) => {
     if (!isLoggedIn || !userData) return;
 
     try {
-      setCoins(Number(userData.coins) || 0);
-      setStars(Number(userData.stars) || 0);
-      setHighestCoins(Number(userData.highestCoins) || 0);
+      // Merge server values with local state. Never decrease local coins/stars
+      const serverCoins = Number(userData.coins) || 0;
+      const serverStars = Number(userData.stars) || 0;
+      const serverHighest = Number(userData.highestCoins) || 0;
       const userTapLimit = userData.tapLimit ?? GAME_CONFIG.INITIAL_TAP_LIMIT;
+
+      setCoins((prev) => {
+        // keep the higher value to avoid visual rollback
+        return Math.max(Number(prev) || 0, serverCoins);
+      });
+
+      setStars((prev) => Math.max(Number(prev) || 0, serverStars));
+
+      setHighestCoins((prev) => Math.max(Number(prev) || 0, serverHighest, serverCoins));
+
       setTapLimit(userTapLimit);
 
       // Restore last refill time from server data or localStorage
-      const savedLocal = localStorage.getItem("lastRefillTime");
-      lastRefillTimeRef.current =
-        userData.lastRefillTime ?? (savedLocal ? Number(savedLocal) : Date.now());
+      const savedLastRefillLocal = localStorage.getItem("lastRefillTime");
+      lastRefillTimeRef.current = getSafeLastRefillTime(
+        userData.lastRefillTime ?? (savedLastRefillLocal ? Number(savedLastRefillLocal) : undefined),
+        userTapLimit
+      );
 
       // Apply refill immediately after loading saved values
       try {
@@ -216,6 +298,12 @@ export const GameProvider = ({ children }) => {
       } catch (e) {
         console.error("Error applying tap refill on login:", e);
       }
+
+      const savedResourceLocal = localStorage.getItem("lastResourceUpdateTime");
+      lastResourceUpdateTimeRef.current = getSafeLastResourceUpdateTime(
+        userData.lastResourceUpdateTime ?? (savedResourceLocal ? Number(savedResourceLocal) : undefined)
+      );
+
       setStreakDays(userData.streakDays ?? 0);
       setLastClaimDate(userData.lastClaimDate ?? null);
       setCards(userData.cards || {});
@@ -224,6 +312,49 @@ export const GameProvider = ({ children }) => {
       console.error("Error applying userData to GameContext:", e);
     }
   }, [isLoggedIn, userData]);
+
+  useEffect(() => {
+    if (isLoggedIn && !userData) return;
+
+    const source = isLoggedIn ? "server" : "local";
+    if (offlineGainSourceRef.current === source) return;
+
+    const savedResourceLocal = localStorage.getItem("lastResourceUpdateTime");
+    const resourceCards = isLoggedIn ? (userData?.cards || {}) : cards;
+    lastResourceUpdateTimeRef.current = getSafeLastResourceUpdateTime(
+      isLoggedIn
+        ? userData?.lastResourceUpdateTime ?? (savedResourceLocal ? Number(savedResourceLocal) : undefined)
+        : savedResourceLocal ? Number(savedResourceLocal) : undefined
+    );
+
+    try {
+      const offlineResources = calculateOfflineResourceGain(
+        resourceCards,
+        Date.now() - lastResourceUpdateTimeRef.current
+      );
+
+      if (offlineResources.coins > 0) {
+        setCoins((prev) => {
+          const newValue = preciseAdd(prev, offlineResources.coins);
+          setHighestCoins((highest) => Math.max(highest, newValue));
+          return newValue;
+        });
+      }
+      if (offlineResources.stars > 0) {
+        setStars((prev) => preciseAdd(prev, offlineResources.stars));
+      }
+    } catch (e) {
+      console.error("Error applying offline resources:", e);
+    }
+
+    lastResourceUpdateTimeRef.current = Date.now();
+    try {
+      localStorage.setItem("lastResourceUpdateTime", String(lastResourceUpdateTimeRef.current));
+    } catch (e) {
+      console.error("Error saving lastResourceUpdateTime to localStorage:", e);
+    }
+    offlineGainSourceRef.current = source;
+  }, [isLoggedIn, userData, cards]);
 
   /* -----------------------------
      LEVEL CALCULATION
@@ -249,8 +380,11 @@ export const GameProvider = ({ children }) => {
 
   useEffect(() => {
     // Try to restore last refill time from localStorage so taps refill while app was closed
-    const saved = localStorage.getItem("lastRefillTime");
-    lastRefillTimeRef.current = saved ? Number(saved) : Date.now();
+    const savedRefill = localStorage.getItem("lastRefillTime");
+    lastRefillTimeRef.current = getSafeLastRefillTime(
+      savedRefill ? Number(savedRefill) : undefined,
+      tapLimit
+    );
 
     // Apply any pending refills immediately on startup
     try {
@@ -263,6 +397,11 @@ export const GameProvider = ({ children }) => {
     } catch (e) {
       console.error("Error applying initial tap refill:", e);
     }
+
+    const savedResource = localStorage.getItem("lastResourceUpdateTime");
+    lastResourceUpdateTimeRef.current = getSafeLastResourceUpdateTime(
+      savedResource ? Number(savedResource) : undefined
+    );
 
     setLastRefillTimeLoaded(true);
   }, []);
@@ -294,6 +433,129 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("nfts", JSON.stringify(nfts));
   }, [nfts]);
+
+  const saveCurrentGameData = () => {
+    if (!isLoggedIn || typeof saveGameData !== "function") return;
+
+    const dataToSave = {
+      coins,
+      stars,
+      highestCoins,
+      tapLimit,
+      level,
+      streakDays,
+      lastClaimDate,
+      cards,
+      nfts,
+      lastRefillTime: lastRefillTimeRef.current,
+      lastResourceUpdateTime: lastResourceUpdateTimeRef.current,
+    };
+
+    // queue immediate local save and mark for flush
+    try {
+      localStorage.setItem("coins", String(dataToSave.coins));
+      localStorage.setItem("stars", String(dataToSave.stars));
+      localStorage.setItem("tapLimit", String(dataToSave.tapLimit));
+      localStorage.setItem("lastRefillTime", String(dataToSave.lastRefillTime));
+      localStorage.setItem("cards", JSON.stringify(dataToSave.cards || {}));
+      localStorage.setItem("nfts", JSON.stringify(dataToSave.nfts || {}));
+      localStorage.setItem("lastResourceUpdateTime", String(dataToSave.lastResourceUpdateTime ?? Date.now()));
+    } catch (e) {
+      console.error("Error writing local save:", e);
+    }
+
+    pendingSaveRef.current = { ...(pendingSaveRef.current || {}), ...dataToSave };
+    pendingSaveDirtyRef.current = true;
+  };
+
+  // Periodic persistence: ensure app updates local state first, then push to server
+  useEffect(() => {
+    const intervalMs = 2 * 60 * 1000; // 2 minutes
+
+    const id = setInterval(() => {
+      try {
+        // Persist locally and queue for flush
+        saveCurrentGameData();
+
+        // Immediately push to server with local timestamp so server snapshots won't overwrite
+        if (isLoggedIn && typeof saveGameData === "function") {
+          const dataToSave = {
+            coins,
+            stars,
+            highestCoins,
+            tapLimit,
+            level,
+            streakDays,
+            lastClaimDate,
+            cards,
+            nfts,
+            lastRefillTime: lastRefillTimeRef.current,
+            lastResourceUpdateTime: lastResourceUpdateTimeRef.current,
+            _localUpdateTimeMs: Date.now(),
+          };
+
+          // fire-and-forget but log errors
+          saveGameData(dataToSave).catch((err) => {
+            console.error("Error during periodic saveGameData:", err);
+          });
+        }
+      } catch (e) {
+        console.error("Periodic persistence failed:", e);
+      }
+    }, intervalMs);
+
+    return () => clearInterval(id);
+  }, [
+    isLoggedIn,
+    saveGameData,
+    coins,
+    stars,
+    highestCoins,
+    tapLimit,
+    level,
+    streakDays,
+    lastClaimDate,
+    cards,
+    nfts,
+  ]);
+
+  // pending save queue (write-local then flush to Firestore on interval)
+  const pendingSaveRef = useRef(null);
+  const pendingSaveDirtyRef = useRef(false);
+
+  const queueSave = (overrides = {}) => {
+    const dataToSave = {
+      coins,
+      stars,
+      highestCoins,
+      tapLimit,
+      level,
+      streakDays,
+      lastClaimDate,
+      cards,
+      nfts,
+      lastRefillTime: lastRefillTimeRef.current,
+      lastResourceUpdateTime: lastResourceUpdateTimeRef.current,
+      ...overrides,
+    };
+
+    // write to localStorage immediately
+    try {
+      localStorage.setItem("coins", String(dataToSave.coins));
+      localStorage.setItem("stars", String(dataToSave.stars));
+      localStorage.setItem("tapLimit", String(dataToSave.tapLimit));
+      localStorage.setItem("lastRefillTime", String(dataToSave.lastRefillTime));
+      localStorage.setItem("cards", JSON.stringify(dataToSave.cards || {}));
+      localStorage.setItem("nfts", JSON.stringify(dataToSave.nfts || {}));
+      localStorage.setItem("lastResourceUpdateTime", String(dataToSave.lastResourceUpdateTime ?? Date.now()));
+    } catch (e) {
+      console.error("Error writing local save:", e);
+    }
+
+    // merge into pending save and mark dirty
+    pendingSaveRef.current = { ...(pendingSaveRef.current || {}), ...dataToSave };
+    pendingSaveDirtyRef.current = true;
+  };
 
   /* -----------------------------
      TAP REFILL ENGINE
@@ -338,6 +600,33 @@ export const GameProvider = ({ children }) => {
     nfts,
     saveGameData,
   ]);
+
+  useEffect(() => {
+    if (!isLoggedIn || typeof saveGameData !== "function") return;
+    // Save card/nft changes locally and mark for flush; flush interval will write to Firestore.
+    saveCurrentGameData();
+  }, [isLoggedIn, cards, nfts, saveGameData]);
+
+  // Flush pending saves to Firestore every 3 seconds (configurable)
+  useEffect(() => {
+    if (!isLoggedIn || typeof saveGameData !== "function") return;
+
+    const flushIntervalMs = 3000; // 3 seconds
+    const id = setInterval(() => {
+      if (pendingSaveDirtyRef.current && pendingSaveRef.current) {
+        const data = { ...(pendingSaveRef.current || {}) };
+        data._localUpdateTimeMs = Date.now();
+        // clear pending before calling save to avoid races
+        pendingSaveDirtyRef.current = false;
+        pendingSaveRef.current = null;
+        saveGameData(data).catch((err) => {
+          console.error('Error flushing pending save:', err);
+        });
+      }
+    }, flushIntervalMs);
+
+    return () => clearInterval(id);
+  }, [isLoggedIn, saveGameData]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -446,8 +735,25 @@ export const GameProvider = ({ children }) => {
 
       return newAmount;
     });
+    // compute new tap value synchronously so we can save immediately
+    setTapLimit((prev) => {
+      const wasFull = prev === GAME_CONFIG.INITIAL_TAP_LIMIT;
+      const newVal = prev - 1;
+      if (wasFull) {
+        const now = Date.now();
+        lastRefillTimeRef.current = now;
+        try {
+          localStorage.setItem("lastRefillTime", String(now));
+        } catch (e) {
+          console.error("Error saving lastRefillTime after tap:", e);
+        }
+      }
 
-    setTapLimit((prev) => prev - 1);
+      // queue the tap change (local saved immediately, Firestore flush will happen on interval)
+      queueSave({ tapLimit: newVal, lastRefillTime: lastRefillTimeRef.current });
+
+      return newVal;
+    });
   };
 
   /* -----------------------------

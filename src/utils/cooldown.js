@@ -2,25 +2,34 @@ import { GAME_CONFIG } from "../constants/gameConfig";
 
 export const calculateTapRefill = (tapLimit, lastRefillTime) => {
   const now = Date.now();
-  const elapsed = now - lastRefillTime;
+  const safeLastRefillTime =
+    typeof lastRefillTime === "number" && lastRefillTime > 0
+      ? lastRefillTime
+      : now - GAME_CONFIG.TAP_REFILL_INTERVAL_MS * GAME_CONFIG.INITIAL_TAP_LIMIT;
 
-  const refillCount = Math.floor(
-    elapsed / GAME_CONFIG.TAP_REFILL_INTERVAL_MS
+  const elapsed = Math.max(0, now - safeLastRefillTime);
+  const refillCount = Math.floor(elapsed / GAME_CONFIG.TAP_REFILL_INTERVAL_MS);
+
+  if (refillCount <= 0) {
+    return { tapLimit, lastRefillTime: safeLastRefillTime };
+  }
+
+  const actualRefill = Math.min(
+    GAME_CONFIG.INITIAL_TAP_LIMIT - tapLimit,
+    refillCount
   );
-
-  if (refillCount <= 0) return { tapLimit, lastRefillTime };
 
   const newTapLimit = Math.min(
     GAME_CONFIG.INITIAL_TAP_LIMIT,
-    tapLimit + refillCount
+    tapLimit + actualRefill
   );
 
   const updatedRefillTime =
-    lastRefillTime +
-    refillCount * GAME_CONFIG.TAP_REFILL_INTERVAL_MS;
+    safeLastRefillTime +
+    actualRefill * GAME_CONFIG.TAP_REFILL_INTERVAL_MS;
 
   return {
     tapLimit: newTapLimit,
-    lastRefillTime: updatedRefillTime
+    lastRefillTime: updatedRefillTime,
   };
 };
